@@ -1,10 +1,3 @@
-//
-//  TuneQuestApp.swift
-//  TuneQuest
-//
-//  Created by Pablo Ruiz Arnal on 28/7/25.
-//
-
 import SwiftUI
 import SwiftData
 

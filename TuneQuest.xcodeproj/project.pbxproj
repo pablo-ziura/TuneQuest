@@ -6,15 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A5971AAC2E37CECC00A3F568 /* TuneNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = A5971AAB2E37CECC00A3F568 /* TuneNetwork */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A5971A6C2E37C69800A3F568 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A5971A532E37C69700A3F568 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A5971A5A2E37C69700A3F568;
-			remoteInfo = TuneQuest;
-		};
-		A5971A762E37C69800A3F568 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A5971A532E37C69700A3F568 /* Project object */;
 			proxyType = 1;
@@ -26,7 +23,7 @@
 /* Begin PBXFileReference section */
 		A5971A5B2E37C69700A3F568 /* TuneQuest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneQuest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5971A6B2E37C69800A3F568 /* TuneQuestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneQuestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A5971A752E37C69800A3F568 /* TuneQuestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneQuestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A5971AA92E37CE3300A3F568 /* TuneNetwork */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TuneNetwork; path = Packages/TuneNetwork; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,11 +37,6 @@
 			path = TuneQuestTests;
 			sourceTree = "<group>";
 		};
-		A5971A782E37C69800A3F568 /* TuneQuestUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TuneQuestUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,17 +44,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5971AAC2E37CECC00A3F568 /* TuneNetwork in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A5971A682E37C69800A3F568 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A5971A722E37C69800A3F568 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -75,9 +61,10 @@
 		A5971A522E37C69700A3F568 = {
 			isa = PBXGroup;
 			children = (
+				A5971AA92E37CE3300A3F568 /* TuneNetwork */,
 				A5971A5D2E37C69700A3F568 /* TuneQuest */,
 				A5971A6E2E37C69800A3F568 /* TuneQuestTests */,
-				A5971A782E37C69800A3F568 /* TuneQuestUITests */,
+				A5971AAA2E37CEC800A3F568 /* Frameworks */,
 				A5971A5C2E37C69700A3F568 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -87,9 +74,15 @@
 			children = (
 				A5971A5B2E37C69700A3F568 /* TuneQuest.app */,
 				A5971A6B2E37C69800A3F568 /* TuneQuestTests.xctest */,
-				A5971A752E37C69800A3F568 /* TuneQuestUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A5971AAA2E37CEC800A3F568 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +105,7 @@
 			);
 			name = TuneQuest;
 			packageProductDependencies = (
+				A5971AAB2E37CECC00A3F568 /* TuneNetwork */,
 			);
 			productName = TuneQuest;
 			productReference = A5971A5B2E37C69700A3F568 /* TuneQuest.app */;
@@ -140,29 +134,6 @@
 			productReference = A5971A6B2E37C69800A3F568 /* TuneQuestTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		A5971A742E37C69800A3F568 /* TuneQuestUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A5971A852E37C69800A3F568 /* Build configuration list for PBXNativeTarget "TuneQuestUITests" */;
-			buildPhases = (
-				A5971A712E37C69800A3F568 /* Sources */,
-				A5971A722E37C69800A3F568 /* Frameworks */,
-				A5971A732E37C69800A3F568 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				A5971A772E37C69800A3F568 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				A5971A782E37C69800A3F568 /* TuneQuestUITests */,
-			);
-			name = TuneQuestUITests;
-			packageProductDependencies = (
-			);
-			productName = TuneQuestUITests;
-			productReference = A5971A752E37C69800A3F568 /* TuneQuestUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -177,10 +148,6 @@
 						CreatedOnToolsVersion = 16.4;
 					};
 					A5971A6A2E37C69800A3F568 = {
-						CreatedOnToolsVersion = 16.4;
-						TestTargetID = A5971A5A2E37C69700A3F568;
-					};
-					A5971A742E37C69800A3F568 = {
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = A5971A5A2E37C69700A3F568;
 					};
@@ -202,7 +169,6 @@
 			targets = (
 				A5971A5A2E37C69700A3F568 /* TuneQuest */,
 				A5971A6A2E37C69800A3F568 /* TuneQuestTests */,
-				A5971A742E37C69800A3F568 /* TuneQuestUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -216,13 +182,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A5971A692E37C69800A3F568 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A5971A732E37C69800A3F568 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -246,13 +205,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A5971A712E37C69800A3F568 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -260,11 +212,6 @@
 			isa = PBXTargetDependency;
 			target = A5971A5A2E37C69700A3F568 /* TuneQuest */;
 			targetProxy = A5971A6C2E37C69800A3F568 /* PBXContainerItemProxy */;
-		};
-		A5971A772E37C69800A3F568 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A5971A5A2E37C69700A3F568 /* TuneQuest */;
-			targetProxy = A5971A762E37C69800A3F568 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -393,6 +340,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TuneQuest;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -401,9 +350,8 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -430,6 +378,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TuneQuest;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -438,9 +388,8 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -461,14 +410,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Pablo.Ruiz.TuneQuestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -483,62 +435,23 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Pablo.Ruiz.TuneQuestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TuneQuest.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TuneQuest";
-				XROS_DEPLOYMENT_TARGET = 2.5;
-			};
-			name = Release;
-		};
-		A5971A862E37C69800A3F568 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MACOSX_DEPLOYMENT_TARGET = 15.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Pablo.Ruiz.TuneQuestUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = TuneQuest;
-				XROS_DEPLOYMENT_TARGET = 2.5;
-			};
-			name = Debug;
-		};
-		A5971A872E37C69800A3F568 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MACOSX_DEPLOYMENT_TARGET = 15.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Pablo.Ruiz.TuneQuestUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = TuneQuest;
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;
@@ -573,16 +486,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A5971A852E37C69800A3F568 /* Build configuration list for PBXNativeTarget "TuneQuestUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A5971A862E37C69800A3F568 /* Debug */,
-				A5971A872E37C69800A3F568 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A5971AAB2E37CECC00A3F568 /* TuneNetwork */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TuneNetwork;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A5971A532E37C69700A3F568 /* Project object */;
 }
