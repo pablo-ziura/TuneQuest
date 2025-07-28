@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import TuneNetwork
 
-@Suite("NetworkClient")
+@Suite("NetworkClient", .serialized)
 struct NetworkClientTests: @unchecked Sendable {
     private struct MockDecodable: Codable, Equatable, Sendable {
         let value: String
@@ -57,7 +57,7 @@ struct NetworkClientTests: @unchecked Sendable {
         if case let NetworkError.unexpectedStatusCode(code)? = thrown {
             #expect(code == 500)
         } else {
-            #expect(false, "Expected unexpectedStatusCode, got \(String(describing: thrown))")
+            #expect(Bool(false), "Expected unexpectedStatusCode, got \(String(describing: thrown))")
         }
     }
 
@@ -85,7 +85,7 @@ struct NetworkClientTests: @unchecked Sendable {
         let _: MockDecodable = try await sut.post(endpoint: "echo", body: body)
 
         guard let sent = await URLProtocolStub.requestBody else {
-            return #expect(false, "No body captured")
+            return #expect(Bool(false), "No body captured")
         }
         let decoded = try decoder.decode(MockDecodable.self, from: sent)
         #expect(decoded == requestValue)
@@ -106,7 +106,7 @@ struct NetworkClientTests: @unchecked Sendable {
         if case let NetworkError.unexpectedStatusCode(code)? = thrown {
             #expect(code == 500)
         } else {
-            #expect(false, "Expected unexpectedStatusCode, got \(String(describing: thrown))")
+            #expect(Bool(false), "Expected unexpectedStatusCode, got \(String(describing: thrown))")
         }
     }
 }
