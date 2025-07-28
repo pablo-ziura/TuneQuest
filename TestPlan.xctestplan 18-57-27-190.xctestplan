@@ -14,16 +14,16 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:TuneQuest.xcodeproj",
-        "identifier" : "A5971A6A2E37C69800A3F568",
-        "name" : "TuneQuestTests"
+        "containerPath" : "container:Packages\/TuneNetwork",
+        "identifier" : "TuneNetworkTests",
+        "name" : "TuneNetworkTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:Packages\/TuneNetwork",
-        "identifier" : "TuneNetworkTests",
-        "name" : "TuneNetworkTests"
+        "containerPath" : "container:TuneQuest.xcodeproj",
+        "identifier" : "A5971A6A2E37C69800A3F568",
+        "name" : "TuneQuestTests"
       }
     }
   ],

@@ -2,89 +2,12 @@ import Foundation
 import Testing
 @testable import TuneNetwork
 
-@MainActor
-final class URLProtocolStub: URLProtocol, @unchecked Sendable {
-    static var stub: (data: Data?, response: URLResponse?, error: Error?)?
-    static var lastRequest: URLRequest?
-    static var requestBody: Data?
-
-    static func configure(data: Data?, statusCode: Int) {
-        let response = HTTPURLResponse(
-            url: URL(string: "https://example.com")!,
-            statusCode: statusCode,
-            httpVersion: nil,
-            headerFields: ["Content-Type": "application/json"]
-        )
-        stub = (data, response, nil)
-        lastRequest = nil
-        requestBody = nil
+@Suite("NetworkClient")
+struct NetworkClientTests: @unchecked Sendable {
+    private struct MockDecodable: Codable, Equatable, Sendable {
+        let value: String
     }
 
-    static func configureError(_ error: Error) {
-        stub = (nil, nil, error)
-        lastRequest = nil
-        requestBody = nil
-    }
-
-    override class func canInit(with request: URLRequest) -> Bool { true }
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
-
-    override func startLoading() {
-        Task { @MainActor in
-            Self.lastRequest = request
-        }
-
-        if let stream = request.httpBodyStream {
-            stream.open()
-            defer { stream.close() }
-            var data = Data()
-            let bufferSize = 1<<10
-            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-            defer { buffer.deallocate() }
-            while stream.hasBytesAvailable {
-                let read = stream.read(buffer, maxLength: bufferSize)
-                if read <= 0 { break }
-                data.append(buffer, count: read)
-            }
-            Task { @MainActor in
-                Self.requestBody = data
-            }
-        } else {
-            Task { @MainActor in
-                Self.requestBody = request.httpBody
-            }
-        }
-
-        Task { @MainActor in
-            if let stub = Self.stub {
-                if let response = stub.response {
-                    client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-                }
-                if let data = stub.data {
-                    client?.urlProtocol(self, didLoad: data)
-                }
-                if let error = stub.error {
-                    client?.urlProtocol(self, didFailWithError: error)
-                } else {
-                    client?.urlProtocolDidFinishLoading(self)
-                }
-            }
-        }
-    }
-
-    override func stopLoading() {}
-}
-
-private struct MockDecodable: Codable, Equatable, Sendable {
-    let value: String
-}
-
-@Suite("URLSessionNetworkClient")
-struct URLSessionNetworkClientTests: @unchecked Sendable {
-
-    // Helpers ---------------------------------------------------------------
-
-    /// Returns a client wired to the `URLProtocolStub`.
     private func makeSUT(baseUrl: String = "https://api.example.com") -> NetworkClient {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [URLProtocolStub.self]
@@ -94,8 +17,6 @@ struct URLSessionNetworkClientTests: @unchecked Sendable {
 
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
-
-    // MARK: - GET -----------------------------------------------------------
 
     @Test("GET • happy path decodes JSON")
     func getSuccess() async throws {
