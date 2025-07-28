@@ -9,5 +9,4 @@ public enum NetworkError: Error, Equatable {
     case unexpectedType
     case unexpectedStatusCode(Int)
     case errorWithMessage(String)
-    case noFilesProvided
 }

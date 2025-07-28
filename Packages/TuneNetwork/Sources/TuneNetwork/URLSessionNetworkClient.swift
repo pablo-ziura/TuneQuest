@@ -1,244 +1,134 @@
 import Foundation
+import OSLog
 
 public final class URLSessionNetworkClient: NetworkClientProtocol {
     private let baseUrl: String
     private let session: URLSession
-    private let encoder: JSONEncoder
     private let decoder: JSONDecoder
-
-    struct HeaderKeys {
-        static let contentType = "Content-Type"
-        static let authorization = "Authorization"
-    }
+    private let logger: Logger
 
     public init(
         baseUrl: String,
         session: URLSession = .shared,
-        encoder: JSONEncoder = JSONEncoder(),
-        decoder: JSONDecoder = JSONDecoder(),
+        decoder: JSONDecoder = .init(),
+        logger: Logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "NetworkClient", category: "Network")
     ) {
         self.baseUrl = baseUrl
         self.session = session
         self.decoder = decoder
-        self.encoder = encoder
+        self.logger = logger
     }
 
-    public func get<O: Decodable & Sendable>(
+    public func get<O: Decodable>(
         endpoint: String,
-        params: [String: String]?,
-        headers: [String: String]?
+        params: [String: String]? = nil,
+        headers: [String: String]? = nil
     ) async throws -> O {
-        try await performRequest(
-            httpMethod: .get,
+        logger.debug("→ GET request to \(endpoint, privacy: .public) params: \(params ?? [:], privacy: .private)")
+        return try await request(
+            .get,
             endpoint: endpoint,
+            params: params,
             headers: headers,
-            params: params
+            body: nil
         )
     }
 
-    public func post<I: Encodable, O: Decodable & Sendable>(
+    public func post<O: Decodable>(
         endpoint: String,
-        params: [String: String]?,
-        headers: [String: String]?,
-        data: I
-    ) async throws -> O {
-        let body = try encoder.encode(data)
-
-        return try await performRequest(
-            httpMethod: .post,
-            endpoint: endpoint,
-            body: body,
-            headers: headers,
-            params: params
-        )
-    }
-
-    public func post<O: Decodable & Sendable>(
-        url: URL,
+        params: [String: String]? = nil,
+        headers: [String: String]? = nil,
         body: Data
     ) async throws -> O {
-        return try await performRequest(
-            httpMethod: .post,
-            url: url,
+        logger.debug("→ POST request to \(endpoint, privacy: .public) params: \(params ?? [:], privacy: .private) bodyLength: \(body.count, privacy: .public)")
+        return try await request(
+            .post,
+            endpoint: endpoint,
+            params: params,
+            headers: headers,
             body: body
         )
     }
 
-    
-    public func postFiles<O: Decodable & Sendable>(
+    private func request<O: Decodable>(
+        _ method: HTTPMethod,
+        endpoint: String,
         params: [String: String]?,
         headers: [String: String]?,
-        files: [Data]
+        body: Data?
     ) async throws -> O {
-        guard !files.isEmpty else {
-            throw NetworkError.noFilesProvided
-        }
-
-        let boundary = UUID().uuidString
-
-        var requestHeaders = [String: String]()
-        headers?.forEach { requestHeaders[$0.key] = $0.value }
-        requestHeaders[HeaderKeys.contentType] = "multipart/form-data; boundary=\(boundary)"
-
-        let multipartRequestItems = files.map {
-            MultipartRequestItem(
-                data: $0,
-                contentDisposition: "name=\"\"; filename=\"\"",
-                contentType: "application/octet-stream"
-            )
-        }
-
-        return try await performRequest(
-            httpMethod: .post,
-            endpoint: endpoint,
-            body: multipartRequestItems.asMultipartData(boundary: boundary),
-            headers: requestHeaders,
-            params: params,
-        )
+        let url = try buildURL(from: endpoint, params: params)
+        logger.debug("Built URL: \(url.absoluteString, privacy: .public)")
+        return try await rawRequest(method, url: url, headers: headers, body: body)
     }
-}
 
-// MARK: - Utility Methods
-
-extension URLSessionNetworkClient {
-    func performRequest<O: Decodable & Sendable>(
-        httpMethod: HTTPMethod,
-        endpoint: String,
-        body: Data? = nil,
+    private func rawRequest<O: Decodable>(
+        _ method: HTTPMethod,
+        url: URL,
         headers: [String: String]? = nil,
-        params: [String: String]? = nil
+        body: Data? = nil
     ) async throws -> O {
-        let url = try buildURL(from: endpoint, with: params)
+        var request = URLRequest(url: url)
+        request.httpMethod = method.rawValue
+        request.httpBody = body
 
-        let urlRequest = try await buildURLRequest(
-            url: url,
-            httpMethod: httpMethod,
-            body: body,
-            headers: headers
-        )
+        var allHeaders = headers ?? [:]
+        if allHeaders["Content-Type"] == nil {
+            allHeaders["Content-Type"] = "application/json"
+        }
+        allHeaders.forEach { request.setValue($1, forHTTPHeaderField: $0) }
 
-        let data = try await performRequestCommon(
-            urlRequest: urlRequest
-        )
+        logger.debug("Sending \(method.rawValue, privacy: .public) to \(url.absoluteString, privacy: .public) headers: \(allHeaders, privacy: .private) bodyLength: \(body?.count ?? 0, privacy: .public)")
 
-        return try decodeOrEmpty(data, responseVersion: responseVersion)
-    }
+        let (data, response): (Data, URLResponse)
 
-    func buildURL(
-        from endpoint: String,
-        with params: [String: String]? = nil
-    ) throws -> URL {
-        let urlString = "\(baseUrl)/\(endpoint)"
-        var components = URLComponents(string: urlString)
-        let queryItems = params?.compactMap { key, value -> URLQueryItem? in
-            if !value.isEmpty {
-                return URLQueryItem(name: key, value: value)
-            }
-            return nil
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            logger.error("Network error: \(error.localizedDescription, privacy: .public)")
+            throw error
         }
 
-        components?.queryItems = queryItems?.isEmpty == true ? nil : queryItems
-        let finalUrlString = components?.url?.absoluteString ?? urlString
-        guard let url = URL(string: finalUrlString) else {
+        guard let http = response as? HTTPURLResponse else {
+            logger.error("No HTTPURLResponse received")
+            throw NetworkError.noHTTPURLResponse
+        }
+
+        logger.debug("Received status: \(http.statusCode, privacy: .public) dataLength: \(data.count, privacy: .public)")
+
+        switch http.statusCode {
+        case 200 ..< 300:
+            break
+        case 401:
+            logger.error("Unauthorized (401)")
+            throw NetworkError.unauthorized
+        default:
+            logger.error("Unexpected status code: \(http.statusCode, privacy: .public)")
+            throw NetworkError.unexpectedStatusCode(http.statusCode)
+        }
+
+        do {
+            let decoded = try decoder.decode(O.self, from: data)
+            logger.debug("Successfully decoded response into \(String(describing: O.self), privacy: .public)")
+            return decoded
+        } catch {
+            let bodyString = String(data: data, encoding: .utf8) ?? "<binary>"
+            logger.error("Decoding error: \(error.localizedDescription, privacy: .public) Raw body: \(bodyString, privacy: .private)")
+            throw NetworkError.errorWithMessage("Decoding error: \(error)")
+        }
+    }
+
+    private func buildURL(from endpoint: String, params: [String: String]?) throws -> URL {
+        var components = URLComponents(string: "\(baseUrl)/\(endpoint)")
+        if let params, !params.isEmpty {
+            components?.queryItems = params
+                .filter { !$0.value.isEmpty }
+                .map { URLQueryItem(name: $0.key, value: $0.value) }
+        }
+        guard let url = components?.url else {
+            logger.error("Malformed URL for endpoint: \(endpoint, privacy: .public)")
             throw NetworkError.wrongURL
         }
         return url
-    }
-}
-
-// MARK: - Private Methods
-
-private extension URLSessionNetworkClient {
-    func performRequest<O: Decodable & Sendable>(
-        httpMethod: HTTPMethod,
-        url: URL,
-        body: Data? = nil
-    ) async throws -> O {
-        let urlRequest = try await buildURLRequest(
-            url: url,
-            httpMethod: httpMethod,
-            body: body,
-            headers: nil
-        )
-
-        let data = try await performRequest(
-            urlRequest: urlRequest,
-        )
-
-        return try decodeOrEmpty(data, responseVersion: nil)
-    }
-
-    func performRequestCommon(
-        urlRequest: URLRequest,
-        responseVersion: APIResponseVersion?
-    ) async throws -> Data {
-        let url = urlRequest.url?.absoluteString ?? "?"
-        let httpMethod = urlRequest.httpMethod ?? "?"
-        print("🛜 Request: \(httpMethod) - \(url)")
-
-        do {
-            let (data, response) = try await session.data(for: urlRequest)
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw NetworkError.noHTTPURLResponse
-            }
-
-            print("🛠 Response to \(url) with status code \(httpResponse.statusCode): \(httpResponse.debugDescription)")
-
-            switch httpResponse.statusCode {
-            case 200 ... 299:
-                return data
-            case 401:
-                throw NetworkError.unauthorized
-            default:
-                throw NetworkError.unexpectedStatusCode(httpResponse.statusCode)
-            }
-        } catch {
-            print("🛑 Error in request \(url): \(error)")
-            throw error
-        }
-    }
-
-    private func handleSuccessResponse<O: Decodable>(
-        data: Data,
-        statusCode: Int,
-        headers: [AnyHashable: Any]
-    ) throws -> O {
-        if data.isEmpty {
-            if O.self == EmptyResponse.self {
-                guard let emptyValue = EmptyResponse() as? O else {
-                    throw NetworkError.unexpectedType
-                }
-
-                return data
-
-            }
-            throw NetworkError.emptyResponse
-        }
-
-    }
-
-    func buildURLRequest(
-        url: URL,
-        httpMethod: HTTPMethod,
-        body: Data? = nil,
-        headers: [String: String]? = nil
-    ) async throws -> URLRequest {
-
-        var requestUrl = URLRequest(url: url)
-
-        requestUrl.httpMethod = httpMethod.rawValue
-        requestUrl.httpBody = body
-
-        var requestHeaders = [String: String]()
-
-        headers?.forEach { requestHeaders[$0.key] = $0.value }
-        if requestHeaders[HeaderKeys.contentType] == nil {
-            requestHeaders[HeaderKeys.contentType] = "application/json"
-        }
-
-        requestHeaders.forEach { requestUrl.addValue($0.value, forHTTPHeaderField: $0.key) }
-
-        return requestUrl
     }
 }

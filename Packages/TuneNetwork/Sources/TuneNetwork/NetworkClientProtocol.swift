@@ -7,22 +7,28 @@ public protocol NetworkClientProtocol: Sendable {
         headers: [String: String]?
     ) async throws -> O
 
-    func post<I: Encodable, O: Decodable>(
+    func post<O: Decodable>(
         endpoint: String,
         params: [String: String]?,
         headers: [String: String]?,
-        data: I
-    ) async throws -> O
-
-    func post<O: Decodable>(
-        url: URL,
         body: Data
     ) async throws -> O
+}
 
-    func postFiles<O: Decodable>(
-        endpoint: APIEndpointProtocol,
-        params: [String: String]?,
-        headers: [String: String]?,
-        files: [Data]
-    ) async throws -> O
+public extension NetworkClientProtocol {
+    func post<I: Encodable, O: Decodable>(
+        endpoint: String,
+        params: [String: String]? = nil,
+        headers: [String: String]? = nil,
+        data: I,
+        encoder: JSONEncoder = .init()
+    ) async throws -> O {
+        let encoded = try encoder.encode(data)
+        return try await post(
+            endpoint: endpoint,
+            params: params,
+            headers: headers,
+            body: encoded
+        )
+    }
 }
