@@ -1,7 +1,7 @@
 import Foundation
 import OSLog
 
-public final class URLSessionNetworkClient: NetworkClientProtocol {
+public final class NetworkClient: NetworkClientProtocol {
     private let baseUrl: String
     private let session: URLSession
     private let decoder: JSONDecoder
