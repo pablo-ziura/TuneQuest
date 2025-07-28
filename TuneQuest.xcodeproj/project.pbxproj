@@ -24,6 +24,7 @@
 		A5971A5B2E37C69700A3F568 /* TuneQuest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneQuest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5971A6B2E37C69800A3F568 /* TuneQuestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneQuestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5971AA92E37CE3300A3F568 /* TuneNetwork */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TuneNetwork; path = Packages/TuneNetwork; sourceTree = "<group>"; };
+		A5971AAE2E37E2DC00A3F568 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -61,6 +62,7 @@
 		A5971A522E37C69700A3F568 = {
 			isa = PBXGroup;
 			children = (
+				A5971AAE2E37E2DC00A3F568 /* TestPlan.xctestplan */,
 				A5971AA92E37CE3300A3F568 /* TuneNetwork */,
 				A5971A5D2E37C69700A3F568 /* TuneQuest */,
 				A5971A6E2E37C69800A3F568 /* TuneQuestTests */,

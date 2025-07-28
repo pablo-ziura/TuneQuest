@@ -1,0 +1,31 @@
+{
+  "configurations" : [
+    {
+      "id" : "3FE60737-5305-4FA0-9ABD-0AAE754248F5",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:TuneQuest.xcodeproj",
+        "identifier" : "A5971A6A2E37C69800A3F568",
+        "name" : "TuneQuestTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/TuneNetwork",
+        "identifier" : "TuneNetworkTests",
+        "name" : "TuneNetworkTests"
+      }
+    }
+  ],
+  "version" : 1
+}
