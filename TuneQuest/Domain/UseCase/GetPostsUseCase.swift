@@ -7,7 +7,7 @@ struct GetPostsUseCase {
         self.repository = repository
     }
 
-    func execute() async throws -> [PostDTO] {
+    func execute() async throws -> [Post] {
         try await repository.posts()
     }
 }

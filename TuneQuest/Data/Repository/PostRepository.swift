@@ -7,7 +7,7 @@ final class PostRepository: PostRepositoryProtocol {
         self.service = service
     }
 
-    func posts() async throws -> [PostDTO] {
-        try await service.fetchPosts()
-    }
-}
+    func posts() async throws -> [Post] {
+        let dtos = try await service.fetchPosts()
+        return dtos.map(Post.init(dto:))
+    }}

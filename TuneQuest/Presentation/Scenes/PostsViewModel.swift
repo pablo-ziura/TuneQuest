@@ -1,11 +1,13 @@
 import SwiftUI
+import OSLog
 
 @MainActor
 @Observable
 final class PostsViewModel {
     let getPostsUseCase: GetPostsUseCase
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "PostsViewModel", category: "Presentation")
 
-    var posts: [PostDTO] = []
+    var posts: [Post] = []
 
     var isLoading = false
 
@@ -28,7 +30,7 @@ final class PostsViewModel {
         do {
             posts = try await getPostsUseCase.execute()
         } catch {
-            print("Error: \(error.localizedDescription)")
+            logger.error("Error: \(error.localizedDescription, privacy: .public)")
         }
     }
 }

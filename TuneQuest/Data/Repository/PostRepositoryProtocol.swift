@@ -1,5 +1,6 @@
 import Foundation
 
 protocol PostRepositoryProtocol: Sendable {
-    func posts() async throws -> [PostDTO]
+    func posts() async throws -> [Post]
+
 }
