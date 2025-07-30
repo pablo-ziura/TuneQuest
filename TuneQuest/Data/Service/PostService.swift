@@ -1,7 +1,7 @@
 import Foundation
 import TuneNetwork
 
-struct PostService: PostServiceProtocol {
+final class PostService: PostServiceProtocol {
     private let client: NetworkClientProtocol
 
     init(client: NetworkClientProtocol) {

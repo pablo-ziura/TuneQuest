@@ -5,7 +5,7 @@ struct PostsView: View {
 
     var body: some View {
         VStack {
-            Text("PostsView")
+            Text("Posts View")
         }
         .task {
             viewModel.fetchData()

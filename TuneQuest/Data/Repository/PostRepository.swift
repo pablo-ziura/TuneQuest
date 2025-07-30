@@ -1,6 +1,6 @@
 import Foundation
 
-actor PostRepository: PostRepositoryProtocol {
+final class PostRepository: PostRepositoryProtocol {
     private let service: PostServiceProtocol
 
     init(service: PostServiceProtocol) {
