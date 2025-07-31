@@ -6,7 +6,12 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            coordinator.getPostsView()
+            VStack(spacing: 20) {
+                Text("Content View")
+                NavigationLink("Go to Home") {
+                    coordinator.getHomeView()
+                }
+            }
         }
     }
 }

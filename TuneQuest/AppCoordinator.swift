@@ -33,4 +33,24 @@ final class AppCoordinator {
             .environment(self)
             .environment(postsViewModel)
     }
+
+    func getHomeView() -> some View {
+        HomeView()
+            .environment(self)
+    }
+
+    func getGameOnePlayerView() -> some View {
+        GameOnePlayerView()
+            .environment(self)
+    }
+
+    func getGameMultiplayerView() -> some View {
+        GameMultiplayerView()
+            .environment(self)
+    }
+
+    func getSettingsView() -> some View {
+        SettingsView()
+            .environment(self)
+    }
 }
