@@ -4,6 +4,13 @@ import SwiftUI
 final class Router {
     var path = NavigationPath()
 
+    var pathBinding: Binding<NavigationPath> {
+        Binding(
+            get: { self.path },
+            set: { self.path = $0 }
+        )
+    }
+
     func push(_ route: Route) {
         path.append(route)
     }

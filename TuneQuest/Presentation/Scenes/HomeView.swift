@@ -5,6 +5,11 @@ struct HomeView: View {
 
     var body: some View {
         VStack(spacing: 20) {
+            #if DEBUG /* For testing purposes only */
+            Button("Posts") {
+                router.push(.posts)
+            }
+            #endif
             Button("One Player") {
                 router.push(.gameOnePlayer)
             }
@@ -16,5 +21,6 @@ struct HomeView: View {
             }
         }
         .navigationTitle("Home")
+        .navigationBarBackButtonHidden(true)
     }
 }

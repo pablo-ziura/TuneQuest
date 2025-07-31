@@ -1,14 +1,12 @@
-import SwiftUI
 import Foundation
+import SwiftUI
 import TuneNetwork
 
 @MainActor
 @Observable
 final class DependencyContainer {
-    // MARK: - Singleton
     static let shared = DependencyContainer()
 
-    // MARK: - Dependencies
     let router: Router
     let networkClient: NetworkClientProtocol
     let postService: PostServiceProtocol
@@ -16,7 +14,6 @@ final class DependencyContainer {
     let getPostsUseCase: GetPostsUseCase
     let postsViewModel: PostsViewModel
 
-    // MARK: - Init
     private init() {
         guard let baseUrl = Bundle.main.infoDictionary?["BASE_URL"] as? String else {
             fatalError("Entry not found for BASE_URL")

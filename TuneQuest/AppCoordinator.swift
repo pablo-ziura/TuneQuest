@@ -11,7 +11,7 @@ final class AppCoordinator {
     }
 
     init() {
-        self.container = DependencyContainer.shared
+        container = DependencyContainer.shared
     }
 
     func getContentView() -> some View {

@@ -6,6 +6,9 @@ struct PostsView: View {
     var body: some View {
         VStack {
             Text("Posts View")
+            List(viewModel.posts, id: \.id) { post in
+                Text(post.title)
+            }
         }
         .task {
             viewModel.fetchData()

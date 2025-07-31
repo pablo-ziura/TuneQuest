@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct ContentView: View {
@@ -6,9 +5,9 @@ struct ContentView: View {
     @Environment(Router.self) private var router
 
     var body: some View {
-        NavigationStack(path: router.path.binding) {
+        NavigationStack(path: router.pathBinding) {
             VStack(spacing: 20) {
-                Text("Content View")
+                Text("Initial View")
                 Button("Go to Home") {
                     router.push(.home)
                 }
