@@ -12,7 +12,7 @@ final class PostsViewModelTests: @unchecked Sendable {
         let useCase = GetPostsUseCase(repository: repo)
         let vm = PostsViewModel(getPostsUseCase: useCase)
 
-        vm.fetchData()
+        await vm.fetchData()
         try await Task.sleep(nanoseconds: 10000000)
 
         #expect(vm.posts == [post])
@@ -26,7 +26,7 @@ final class PostsViewModelTests: @unchecked Sendable {
         let useCase = GetPostsUseCase(repository: repo)
         let vm = PostsViewModel(getPostsUseCase: useCase)
 
-        vm.fetchData()
+        await vm.fetchData()
         try await Task.sleep(nanoseconds: 10000000)
 
         #expect(vm.posts.isEmpty)

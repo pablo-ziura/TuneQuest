@@ -11,7 +11,7 @@ struct PostsView: View {
             }
         }
         .task {
-            viewModel.fetchData()
+            await viewModel.fetchData()
         }
     }
 }

@@ -11,19 +11,14 @@ final class PostsViewModel {
 
     var isLoading = false
 
-    private var fetchTask: Task<Void, Never>?
-
     init(getPostsUseCase: GetPostsUseCase) {
         self.getPostsUseCase = getPostsUseCase
     }
 
-    public func fetchData() {
-        fetchTask?.cancel()
-        fetchTask = Task {
-            isLoading = true
-            defer { isLoading = false }
-            await self.getPosts()
-        }
+    public func fetchData() async {
+        isLoading = true
+        defer { isLoading = false }
+        await self.getPosts()
     }
 
     private func getPosts() async {
