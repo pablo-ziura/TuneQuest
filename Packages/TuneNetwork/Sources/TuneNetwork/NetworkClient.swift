@@ -109,7 +109,11 @@ public final class NetworkClient: NetworkClientProtocol {
 
         do {
             let decoded = try decoder.decode(O.self, from: data)
-            logger.debug("Successfully decoded response into \(String(describing: O.self), privacy: .public)")
+
+            if let jsonString = String(data: data, encoding: .utf8) {
+                logger.info("📥 JSON Received:\n\(jsonString, privacy: .public) ✨")
+            }
+
             return decoded
         } catch {
             let bodyString = String(data: data, encoding: .utf8) ?? "<binary>"
