@@ -1,18 +1,18 @@
 import SwiftUI
 
 struct HomeView: View {
-    @Environment(AppCoordinator.self) private var coordinator
+    @Environment(Router.self) private var router
 
     var body: some View {
         VStack(spacing: 20) {
-            NavigationLink("One Player") {
-                coordinator.getGameOnePlayerView()
+            Button("One Player") {
+                router.push(.gameOnePlayer)
             }
-            NavigationLink("Multiplayer") {
-                coordinator.getGameMultiplayerView()
+            Button("Multiplayer") {
+                router.push(.gameMultiplayer)
             }
-            NavigationLink("Settings") {
-                coordinator.getSettingsView()
+            Button("Settings") {
+                router.push(.settings)
             }
         }
         .navigationTitle("Home")

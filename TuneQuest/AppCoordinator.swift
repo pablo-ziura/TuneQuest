@@ -5,52 +5,71 @@ import TuneNetwork
 @MainActor
 @Observable
 final class AppCoordinator {
-    private let networkClient: NetworkClientProtocol
-    private let postsViewModel: PostsViewModel
+    let container: DependencyContainer
+    var router: Router {
+        container.router
+    }
 
     init() {
-        guard let baseUrl = Bundle.main.infoDictionary?["BASE_URL"] as? String else {
-            fatalError("Entry not found for BASE_URL")
-        }
-
-        networkClient = NetworkClient(baseUrl: baseUrl)
-
-        let service = PostService(client: networkClient)
-        let repository = PostRepository(service: service)
-        let getPostsUseCase = GetPostsUseCase(repository: repository)
-
-        postsViewModel = PostsViewModel(getPostsUseCase: getPostsUseCase)
-
+        self.container = DependencyContainer.shared
     }
 
     func getContentView() -> some View {
         ContentView()
             .environment(self)
+            .environment(router)
+            .environment(container)
     }
 
     func getPostsView() -> some View {
         PostsView()
             .environment(self)
-            .environment(postsViewModel)
+            .environment(router)
+            .environment(container)
+            .environment(container.postsViewModel)
     }
 
     func getHomeView() -> some View {
         HomeView()
             .environment(self)
+            .environment(router)
+            .environment(container)
     }
 
     func getGameOnePlayerView() -> some View {
         GameOnePlayerView()
             .environment(self)
+            .environment(router)
+            .environment(container)
     }
 
     func getGameMultiplayerView() -> some View {
         GameMultiplayerView()
             .environment(self)
+            .environment(router)
+            .environment(container)
     }
 
     func getSettingsView() -> some View {
         SettingsView()
             .environment(self)
+            .environment(router)
+            .environment(container)
+    }
+
+    @ViewBuilder
+    func destination(for route: Route) -> some View {
+        switch route {
+        case .home:
+            getHomeView()
+        case .posts:
+            getPostsView()
+        case .gameOnePlayer:
+            getGameOnePlayerView()
+        case .gameMultiplayer:
+            getGameMultiplayerView()
+        case .settings:
+            getSettingsView()
+        }
     }
 }
