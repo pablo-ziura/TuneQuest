@@ -1,7 +1,7 @@
 import SwiftUI
 
-struct PreviewPlayerView: View {
-    @Environment(PreviewPlayerManager.self) private var manager
+struct AudioPlayerManagerView: View {
+    @Environment(AudioPlayerManager.self) private var manager
 
     var body: some View {
         VStack(spacing: 24) {
@@ -21,9 +21,4 @@ struct PreviewPlayerView: View {
             }
         }
     }
-}
-
-#Preview {
-    PreviewPlayerView()
-        .environment(PreviewPlayerManager())
 }

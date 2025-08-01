@@ -3,10 +3,15 @@ import AVFoundation
 
 @MainActor
 @Observable
-final class PreviewPlayerManager {
+final class AudioPlayerManager {
+    private let getPreviewUseCase: GetTrackPreviewUseCase
     private var player: AVPlayer?
     var isPlaying = false
     var isLoading = false
+
+    init(getPreviewUseCase: GetTrackPreviewUseCase) {
+        self.getPreviewUseCase = getPreviewUseCase
+    }
 
     func loadPreview(trackId: Int) async {
         isLoading = true
@@ -51,17 +56,8 @@ final class PreviewPlayerManager {
 
     private func fetchPreview(trackId: Int) async {
         do {
-            let url = URL(string: "https://api.deezer.com/track/\(trackId)")!
-            let (data, _) = try await URLSession.shared.data(from: url)
-            guard
-                let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                let previewString = json["preview"] as? String,
-                let previewURL = URL(string: previewString)
-            else {
-                print("No se encontró campo preview")
-                return
-            }
-            self.player = AVPlayer(url: previewURL)
+            let preview = try await getPreviewUseCase.execute(trackId: trackId)
+            self.player = AVPlayer(url: preview.url)
             play()
         } catch {
             print("Error de red: \(error)")

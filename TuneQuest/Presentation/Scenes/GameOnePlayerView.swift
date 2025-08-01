@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct GameOnePlayerView: View {
-    @Environment(PreviewPlayerManager.self) private var playerManager
+    @Environment(AudioPlayerManager.self) private var playerManager
 
     var body: some View {
         VStack(spacing: 32) {
             Text("Deezer Preview")
                 .font(.title2)
-            PreviewPlayerView()
+            AudioPlayerManagerView()
         }
         .padding()
         .task {
@@ -15,9 +15,4 @@ struct GameOnePlayerView: View {
         }
         .navigationTitle("One Player")
     }
-}
-
-#Preview {
-    GameOnePlayerView()
-        .environment(PreviewPlayerManager())
 }

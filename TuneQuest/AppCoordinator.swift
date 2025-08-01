@@ -21,14 +21,6 @@ final class AppCoordinator {
             .environment(container)
     }
 
-    func getPostsView() -> some View {
-        PostsView()
-            .environment(self)
-            .environment(router)
-            .environment(container)
-            .environment(container.postsViewModel)
-    }
-
     func getHomeView() -> some View {
         HomeView()
             .environment(self)
@@ -41,7 +33,7 @@ final class AppCoordinator {
             .environment(self)
             .environment(router)
             .environment(container)
-            .environment(container.previewPlayerManager)
+            .environment(container.audioPlayerManager)
     }
 
     func getGameMultiplayerView() -> some View {
@@ -63,8 +55,6 @@ final class AppCoordinator {
         switch route {
         case .home:
             getHomeView()
-        case .posts:
-            getPostsView()
         case .gameOnePlayer:
             getGameOnePlayerView()
         case .gameMultiplayer:
