@@ -1,52 +1,70 @@
-import AVFoundation
 import SwiftUI
+import AVFoundation
 
 struct GameOnePlayerView: View {
-    @State private var player: AVPlayer? // Reproductor AV
-    @State private var isPlaying = false // Estado de reproducción
-    @State private var previewURL: URL? // URL de la preview obtenida
+    @State private var player: AVPlayer?
+    @State private var isPlaying = false
+    @State private var loading = true     // Mientras descargamos la URL
 
     var body: some View {
-        VStack {
-            Button(action: {
-                if let player = player {
-                    // Alternar entre reproducir y pausar
-                    if player.timeControlStatus == .playing {
-                        player.pause()
-                        isPlaying = false
-                    } else {
-                        player.play()
-                        isPlaying = true
-                    }
-                } else if let url = previewURL {
-                    // Inicializar AVPlayer con la URL de preview y comenzar reproducción
-                    player = AVPlayer(url: url)
-                    player?.play()
-                    isPlaying = true
+        VStack(spacing: 24) {
+            if loading {
+                ProgressView("Cargando preview…")
+            } else {
+                Button(isPlaying ? "Pausar" : "Reproducir") {
+                    togglePlayback()
                 }
-            }) {
-                Text(isPlaying ? "Pausar Preview" : "Reproducir Preview")
+                .font(.title2)
             }
         }
-        .onAppear {
-            // 1. Obtener la información de la canción (ejemplo: ID 3135556)
-            let trackId = 3135556
-            let apiURL = URL(string: "https://api.deezer.com/track/\(trackId)")!
+        .padding()
+        .task {      // Swift 5.5+ async/await
+            await configureAudioSession()
+            await fetchPreviewAndPlay(trackId: 3135556)
+        }
+    }
 
-            // 2. Llamar a la API de Deezer (request HTTP) para obtener los datos de la pista
-            URLSession.shared.dataTask(with: apiURL) { data, _, error in
-                guard let data = data, error == nil else { return }
-                // 3. Parsear el JSON para extraer el campo "preview"
-                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let previewString = json["preview"] as? String,
-                   let url = URL(string: previewString) {
-                    // 4. Guardar la URL de preview en el estado (en el hilo principal)
-                    DispatchQueue.main.async {
-                        self.previewURL = url
-                    }
-                }
+    private func togglePlayback() {
+        guard let player = player else { return }
+        if player.timeControlStatus == .playing {
+            player.pause()
+            isPlaying = false
+        } else {
+            player.play()
+            isPlaying = true
+        }
+    }
+
+    private func configureAudioSession() async {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Sesión de audio: \(error)")
+        }
+    }
+
+    private func fetchPreviewAndPlay(trackId: Int) async {
+        do {
+            let url = URL(string: "https://api.deezer.com/track/\(trackId)")!
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard
+                let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                let previewString = json["preview"] as? String,
+                let previewURL = URL(string: previewString)
+            else {
+                print("No se encontró campo preview")
+                return
             }
-            .resume()
+
+            await MainActor.run {
+                self.player = AVPlayer(url: previewURL)
+                self.player?.play()
+                self.isPlaying = true
+                self.loading = false
+            }
+        } catch {
+            print("Error de red: \(error)")
         }
     }
 }
