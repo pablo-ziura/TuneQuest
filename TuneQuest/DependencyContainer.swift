@@ -13,6 +13,7 @@ final class DependencyContainer {
     let postRepository: PostRepositoryProtocol
     let getPostsUseCase: GetPostsUseCase
     let postsViewModel: PostsViewModel
+    let previewPlayerManager: PreviewPlayerManager
 
     private init() {
         guard let baseUrl = Bundle.main.infoDictionary?["BASE_URL"] as? String else {
@@ -44,5 +45,7 @@ final class DependencyContainer {
 
         getPostsUseCase = GetPostsUseCase(repository: repository)
         postsViewModel = PostsViewModel(getPostsUseCase: getPostsUseCase)
+
+        previewPlayerManager = PreviewPlayerManager()
     }
 }

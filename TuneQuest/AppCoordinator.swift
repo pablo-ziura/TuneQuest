@@ -41,6 +41,7 @@ final class AppCoordinator {
             .environment(self)
             .environment(router)
             .environment(container)
+            .environment(container.previewPlayerManager)
     }
 
     func getGameMultiplayerView() -> some View {
