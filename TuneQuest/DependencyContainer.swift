@@ -9,10 +9,10 @@ final class DependencyContainer {
 
     let router: Router
     let networkClient: NetworkClientProtocol
-    let postService: PostServiceProtocol
-    let postRepository: PostRepositoryProtocol
-    let getPostsUseCase: GetPostsUseCase
-    let postsViewModel: PostsViewModel
+    let trackService: TrackServiceProtocol
+    let trackRepository: TrackRepositoryProtocol
+    let getTrackPreviewUseCase: GetTrackPreviewUseCase
+    let audioPlayerManager: AudioPlayerManager
 
     private init() {
         guard let baseUrl = Bundle.main.infoDictionary?["BASE_URL"] as? String else {
@@ -25,24 +25,22 @@ final class DependencyContainer {
             NetworkClient(baseUrl: baseUrl)
         }
 
-        func makePostService(client: NetworkClientProtocol) -> PostServiceProtocol {
-            PostService(client: client)
+        func makeTrackService(client: NetworkClientProtocol) -> TrackServiceProtocol {
+            TrackService(client: client)
         }
 
-        func makePostRepository(service: PostServiceProtocol) -> PostRepositoryProtocol {
-            PostRepository(service: service)
+        func makeTrackRepository(service: TrackServiceProtocol) -> TrackRepositoryProtocol {
+            TrackRepository(service: service)
         }
 
-        let client = makeNetworkClient()
-        networkClient = client
+        networkClient = makeNetworkClient()
 
-        let service = makePostService(client: client)
-        postService = service
+        trackService = makeTrackService(client: networkClient)
 
-        let repository = makePostRepository(service: service)
-        postRepository = repository
+        trackRepository = makeTrackRepository(service: trackService)
 
-        getPostsUseCase = GetPostsUseCase(repository: repository)
-        postsViewModel = PostsViewModel(getPostsUseCase: getPostsUseCase)
+        getTrackPreviewUseCase = GetTrackPreviewUseCase(repository: trackRepository)
+
+        audioPlayerManager = AudioPlayerManager(getPreviewUseCase: getTrackPreviewUseCase)
     }
 }

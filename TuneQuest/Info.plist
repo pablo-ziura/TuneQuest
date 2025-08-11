@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>BASE_URL</key>
-	<string>https://jsonplaceholder.typicode.com</string>
+	<string>https://api.deezer.com</string>
 </dict>
 </plist>

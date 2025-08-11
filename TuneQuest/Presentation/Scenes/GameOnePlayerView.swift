@@ -1,8 +1,18 @@
 import SwiftUI
 
 struct GameOnePlayerView: View {
+    @Environment(AudioPlayerManager.self) private var playerManager
+
     var body: some View {
-        Text("Game One Player")
-            .navigationTitle("One Player")
+        VStack(spacing: 32) {
+            Text("Deezer Preview")
+                .font(.title2)
+            AudioPlayerManagerView()
+        }
+        .padding()
+        .task {
+            await playerManager.loadPreview(trackId: 3135556)
+        }
+        .navigationTitle("One Player")
     }
 }

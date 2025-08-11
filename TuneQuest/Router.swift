@@ -26,7 +26,6 @@ final class Router {
 
 enum Route: Hashable {
     case home
-    case posts
     case gameOnePlayer
     case gameMultiplayer
     case settings
