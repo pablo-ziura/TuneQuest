@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GameOnePlayerView: View {
     @Environment(AudioPlayerManager.self) private var playerManager
+    @Environment(CatalogViewModel.self) private var viewModel
 
     var body: some View {
         VStack(spacing: 32) {
