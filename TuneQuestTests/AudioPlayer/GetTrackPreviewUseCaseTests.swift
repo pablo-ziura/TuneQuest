@@ -7,7 +7,7 @@ import Testing
 final class GetTrackPreviewUseCaseTests: @unchecked Sendable {
     @Test("execute returns repository track")
     func executeSuccess() async throws {
-        let track = Track(url: URL(string: "https://example.com/track.mp3")!)
+        let track = Track(previewURL: URL(string: "https://example.com/track.mp3")!)
         let repo = MockTrackRepository(result: .success(track))
         let sut = GetTrackPreviewUseCase(repository: repo)
 

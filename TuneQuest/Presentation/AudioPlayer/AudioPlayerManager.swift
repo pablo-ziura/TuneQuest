@@ -1,5 +1,5 @@
-import SwiftUI
 import AVFoundation
+import SwiftUI
 
 @MainActor
 @Observable
@@ -8,6 +8,7 @@ final class AudioPlayerManager {
     private var player: AVPlayer?
     var isPlaying = false
     var isLoading = false
+    var currentTrack: Track?
 
     init(getPreviewUseCase: GetTrackPreviewUseCase) {
         self.getPreviewUseCase = getPreviewUseCase
@@ -17,6 +18,7 @@ final class AudioPlayerManager {
         isLoading = true
         defer { isLoading = false }
         await configureAudioSession()
+        stop()
         await fetchPreview(trackId: trackId)
     }
 
@@ -56,9 +58,12 @@ final class AudioPlayerManager {
 
     private func fetchPreview(trackId: Int) async {
         do {
-            let preview = try await getPreviewUseCase.execute(trackId: trackId)
-            self.player = AVPlayer(url: preview.url)
-            play()
+            let track = try await getPreviewUseCase.execute(trackId: trackId)
+            currentTrack = track
+            if let url = track.preview {
+                player = AVPlayer(url: url)
+                play()
+            }
         } catch {
             print("Error de red: \(error)")
         }
