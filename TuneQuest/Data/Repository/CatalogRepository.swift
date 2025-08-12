@@ -1,14 +1,14 @@
 import Foundation
 
 final class CatalogRepository: CatalogRepositoryProtocol {
-    private let service: CatalogServiceProtocol
+    private let dataSource: CatalogDataSourceProtocol
 
-    init(service: CatalogServiceProtocol) {
-        self.service = service
+    init(dataSource: CatalogDataSourceProtocol) {
+        self.dataSource = dataSource
     }
 
     func fetchCatalog() async throws -> Catalog {
-        let dto = try await service.fetchCatalog()
+        let dto = try await dataSource.fetchCatalog()
         return Catalog(dto: dto)
     }
 }

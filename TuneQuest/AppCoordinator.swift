@@ -18,21 +18,18 @@ final class AppCoordinator {
         ContentView()
             .environment(self)
             .environment(router)
-            .environment(container)
     }
 
     func getHomeView() -> some View {
         HomeView()
             .environment(self)
             .environment(router)
-            .environment(container)
     }
 
     func getGameOnePlayerView() -> some View {
         GameOnePlayerView()
             .environment(self)
             .environment(router)
-            .environment(container)
             .environment(container.audioPlayerManager)
             .environment(container.catalogViewModel)
     }
@@ -41,14 +38,12 @@ final class AppCoordinator {
         GameMultiplayerView()
             .environment(self)
             .environment(router)
-            .environment(container)
     }
 
     func getSettingsView() -> some View {
         SettingsView()
             .environment(self)
             .environment(router)
-            .environment(container)
     }
 
     @ViewBuilder

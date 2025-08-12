@@ -1,5 +1,5 @@
 import Foundation
 
-protocol CatalogServiceProtocol: Sendable {
+protocol CatalogDataSourceProtocol: Sendable {
     func fetchCatalog() async throws -> CatalogDTO
 }

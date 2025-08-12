@@ -12,11 +12,11 @@ final class DependencyContainer {
     let trackService: TrackServiceProtocol
     let trackRepository: TrackRepositoryProtocol
     let getTrackPreviewUseCase: GetTrackPreviewUseCase
-    let catalogService: CatalogServiceProtocol
+    let catalogDataSource: CatalogDataSourceProtocol
     let catalogRepository: CatalogRepositoryProtocol
     let getCatalogUseCase: GetCatalogUseCase
-    let audioPlayerManager: AudioPlayerManager
     let catalogViewModel: CatalogViewModel
+    let audioPlayerManager: AudioPlayerManager
 
     private init() {
         guard let baseUrl = Bundle.main.infoDictionary?["BASE_URL"] as? String else {
@@ -37,12 +37,16 @@ final class DependencyContainer {
             TrackRepository(service: service)
         }
 
-        func makeCatalogService() -> CatalogServiceProtocol {
-            CatalogService()
+        func makeCatalogDataSource() -> CatalogDataSourceProtocol {
+            CatalogLocalDataSource()
         }
 
-        func makeCatalogRepository(service: CatalogServiceProtocol) -> CatalogRepositoryProtocol {
-            CatalogRepository(service: service)
+        func makeCatalogRepository(dataSource: CatalogDataSourceProtocol) -> CatalogRepositoryProtocol {
+            CatalogRepository(dataSource: dataSource)
+        }
+
+        func makeCatalogViewModel(getCatalogUseCase: GetCatalogUseCase) -> CatalogViewModel {
+            CatalogViewModel(getCatalogUseCase: getCatalogUseCase)
         }
 
         networkClient = makeNetworkClient()
@@ -53,9 +57,9 @@ final class DependencyContainer {
 
         getTrackPreviewUseCase = GetTrackPreviewUseCase(repository: trackRepository)
 
-        catalogService = makeCatalogService()
+        catalogDataSource = makeCatalogDataSource()
 
-        catalogRepository = makeCatalogRepository(service: catalogService)
+        catalogRepository = makeCatalogRepository(dataSource: catalogDataSource)
 
         getCatalogUseCase = GetCatalogUseCase(repository: catalogRepository)
 
