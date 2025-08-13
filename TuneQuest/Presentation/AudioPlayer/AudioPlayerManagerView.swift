@@ -20,5 +20,8 @@ struct AudioPlayerManagerView: View {
                 }
             }
         }
+        .onDisappear {
+            manager.stop()
+        }
     }
 }

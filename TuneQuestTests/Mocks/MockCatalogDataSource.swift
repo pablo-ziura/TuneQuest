@@ -1,15 +1,14 @@
 import Foundation
-@testable import TuneNetwork
 @testable import TuneQuest
 
-final actor MockPostRepository: PostRepositoryProtocol, @unchecked Sendable {
-    var result: Result<[Post], Error>
+final actor MockCatalogDataSource: CatalogDataSourceProtocol, @unchecked Sendable {
+    var result: Result<CatalogDTO, Error>
 
-    init(result: Result<[Post], Error>) {
+    init(result: Result<CatalogDTO, Error>) {
         self.result = result
     }
 
-    func posts() async throws -> [Post] {
+    func fetchCatalog() async throws -> CatalogDTO {
         switch result {
         case let .success(value):
             return value

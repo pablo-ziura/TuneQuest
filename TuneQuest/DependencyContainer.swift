@@ -12,6 +12,10 @@ final class DependencyContainer {
     let trackService: TrackServiceProtocol
     let trackRepository: TrackRepositoryProtocol
     let getTrackPreviewUseCase: GetTrackPreviewUseCase
+    let catalogDataSource: CatalogDataSourceProtocol
+    let catalogRepository: CatalogRepositoryProtocol
+    let getCatalogUseCase: GetCatalogUseCase
+    let catalogViewModel: CatalogViewModel
     let audioPlayerManager: AudioPlayerManager
 
     private init() {
@@ -33,6 +37,18 @@ final class DependencyContainer {
             TrackRepository(service: service)
         }
 
+        func makeCatalogDataSource() -> CatalogDataSourceProtocol {
+            CatalogLocalDataSource()
+        }
+
+        func makeCatalogRepository(dataSource: CatalogDataSourceProtocol) -> CatalogRepositoryProtocol {
+            CatalogRepository(dataSource: dataSource)
+        }
+
+        func makeCatalogViewModel(getCatalogUseCase: GetCatalogUseCase) -> CatalogViewModel {
+            CatalogViewModel(getCatalogUseCase: getCatalogUseCase)
+        }
+
         networkClient = makeNetworkClient()
 
         trackService = makeTrackService(client: networkClient)
@@ -40,6 +56,14 @@ final class DependencyContainer {
         trackRepository = makeTrackRepository(service: trackService)
 
         getTrackPreviewUseCase = GetTrackPreviewUseCase(repository: trackRepository)
+
+        catalogDataSource = makeCatalogDataSource()
+
+        catalogRepository = makeCatalogRepository(dataSource: catalogDataSource)
+
+        getCatalogUseCase = GetCatalogUseCase(repository: catalogRepository)
+
+        catalogViewModel = CatalogViewModel(getCatalogUseCase: getCatalogUseCase)
 
         audioPlayerManager = AudioPlayerManager(getPreviewUseCase: getTrackPreviewUseCase)
     }
