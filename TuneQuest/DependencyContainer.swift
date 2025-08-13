@@ -9,10 +9,14 @@ final class DependencyContainer {
 
     let router: Router
     let networkClient: NetworkClientProtocol
-    let postService: PostServiceProtocol
-    let postRepository: PostRepositoryProtocol
-    let getPostsUseCase: GetPostsUseCase
-    let postsViewModel: PostsViewModel
+    let trackService: TrackServiceProtocol
+    let trackRepository: TrackRepositoryProtocol
+    let getTrackPreviewUseCase: GetTrackPreviewUseCase
+    let catalogDataSource: CatalogDataSourceProtocol
+    let catalogRepository: CatalogRepositoryProtocol
+    let getCatalogUseCase: GetCatalogUseCase
+    let catalogViewModel: CatalogViewModel
+    let audioPlayerManager: AudioPlayerManager
 
     private init() {
         guard let baseUrl = Bundle.main.infoDictionary?["BASE_URL"] as? String else {
@@ -25,24 +29,42 @@ final class DependencyContainer {
             NetworkClient(baseUrl: baseUrl)
         }
 
-        func makePostService(client: NetworkClientProtocol) -> PostServiceProtocol {
-            PostService(client: client)
+        func makeTrackService(client: NetworkClientProtocol) -> TrackServiceProtocol {
+            TrackService(client: client)
         }
 
-        func makePostRepository(service: PostServiceProtocol) -> PostRepositoryProtocol {
-            PostRepository(service: service)
+        func makeTrackRepository(service: TrackServiceProtocol) -> TrackRepositoryProtocol {
+            TrackRepository(service: service)
         }
 
-        let client = makeNetworkClient()
-        networkClient = client
+        func makeCatalogDataSource() -> CatalogDataSourceProtocol {
+            CatalogLocalDataSource()
+        }
 
-        let service = makePostService(client: client)
-        postService = service
+        func makeCatalogRepository(dataSource: CatalogDataSourceProtocol) -> CatalogRepositoryProtocol {
+            CatalogRepository(dataSource: dataSource)
+        }
 
-        let repository = makePostRepository(service: service)
-        postRepository = repository
+        func makeCatalogViewModel(getCatalogUseCase: GetCatalogUseCase) -> CatalogViewModel {
+            CatalogViewModel(getCatalogUseCase: getCatalogUseCase)
+        }
 
-        getPostsUseCase = GetPostsUseCase(repository: repository)
-        postsViewModel = PostsViewModel(getPostsUseCase: getPostsUseCase)
+        networkClient = makeNetworkClient()
+
+        trackService = makeTrackService(client: networkClient)
+
+        trackRepository = makeTrackRepository(service: trackService)
+
+        getTrackPreviewUseCase = GetTrackPreviewUseCase(repository: trackRepository)
+
+        catalogDataSource = makeCatalogDataSource()
+
+        catalogRepository = makeCatalogRepository(dataSource: catalogDataSource)
+
+        getCatalogUseCase = GetCatalogUseCase(repository: catalogRepository)
+
+        catalogViewModel = CatalogViewModel(getCatalogUseCase: getCatalogUseCase)
+
+        audioPlayerManager = AudioPlayerManager(getPreviewUseCase: getTrackPreviewUseCase)
     }
 }

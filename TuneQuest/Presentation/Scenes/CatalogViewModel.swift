@@ -3,27 +3,27 @@ import OSLog
 
 @MainActor
 @Observable
-final class PostsViewModel {
-    let getPostsUseCase: GetPostsUseCase
+final class CatalogViewModel {
+    let getCatalogUseCase: GetCatalogUseCase
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "PostsViewModel", category: "Presentation")
 
-    var posts: [Post] = []
+    var catalog: Catalog?
 
     var isLoading = false
 
-    init(getPostsUseCase: GetPostsUseCase) {
-        self.getPostsUseCase = getPostsUseCase
+    init(getCatalogUseCase: GetCatalogUseCase) {
+        self.getCatalogUseCase = getCatalogUseCase
     }
 
     public func fetchData() async {
         isLoading = true
         defer { isLoading = false }
-        await self.getPosts()
+        await self.getCatalog()
     }
 
-    private func getPosts() async {
+    private func getCatalog() async {
         do {
-            posts = try await getPostsUseCase.execute()
+            catalog = try await getCatalogUseCase.execute()
         } catch {
             logger.error("Error: \(error.localizedDescription, privacy: .public)")
         }
