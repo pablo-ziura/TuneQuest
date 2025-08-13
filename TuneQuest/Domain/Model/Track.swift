@@ -18,7 +18,7 @@ struct Track: Equatable, Hashable, Sendable {
     let explicitContentLyrics: Int?
     let explicitContentCover: Int?
     let preview: URL?
-    let bpm: Int?
+    let bpm: Double?
     let gain: Double?
     let availableCountries: [String]?
     let contributors: [Artist]?

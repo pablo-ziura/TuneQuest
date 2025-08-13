@@ -18,7 +18,7 @@ struct TrackDTO: Codable, Equatable, Hashable, Sendable {
     let explicitContentLyrics: Int?
     let explicitContentCover: Int?
     let preview: String?
-    let bpm: Int?
+    let bpm: Double?
     let gain: Double?
     let availableCountries: [String]?
     let contributors: [ArtistDTO]?
@@ -66,7 +66,7 @@ struct TrackDTO: Codable, Equatable, Hashable, Sendable {
         explicitContentLyrics: Int? = nil,
         explicitContentCover: Int? = nil,
         preview: String? = nil,
-        bpm: Int? = nil,
+        bpm: Double? = nil,
         gain: Double? = nil,
         availableCountries: [String]? = nil,
         contributors: [ArtistDTO]? = nil,
