@@ -3,5 +3,5 @@ import Foundation
 struct CatalogDTO: Codable, Equatable, Hashable, Sendable {
     let version: Int
     let modified: String
-    let ids: [String]
+    let ids: [Int]
 }

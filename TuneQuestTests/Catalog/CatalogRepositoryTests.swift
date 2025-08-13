@@ -6,7 +6,7 @@ import Testing
 final class CatalogRepositoryTests: @unchecked Sendable {
     @Test("fetchCatalog maps DTO to domain model")
     func fetchCatalogSuccess() async throws {
-        let dto = CatalogDTO(version: 1, modified: "2025-08-11", ids: ["1", "2"])
+        let dto = CatalogDTO(version: 1, modified: "2025-08-11", ids: [1, 2])
         let dataSource = MockCatalogDataSource(result: .success(dto))
         let sut = CatalogRepository(dataSource: dataSource)
 

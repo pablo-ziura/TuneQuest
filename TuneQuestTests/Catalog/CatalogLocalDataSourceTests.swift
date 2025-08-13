@@ -11,14 +11,14 @@ final class CatalogLocalDataSourceTests: @unchecked Sendable {
             {
             "version":1,
             "modified":"2025-08-11",
-            "ids":["1","2"]
+            "ids":[1,2]
             }
             """
             .data(using: .utf8)!
         let sut = CatalogLocalDataSource(loader: { json })
 
         let result = try await sut.fetchCatalog()
-        #expect(result == CatalogDTO(version: 1, modified: "2025-08-11", ids: ["1", "2"]))
+        #expect(result == CatalogDTO(version: 1, modified: "2025-08-11", ids: [1, 2]))
     }
 
     @Test("fetchCatalog propagates errors")
