@@ -17,6 +17,7 @@ final class DependencyContainer {
     let getCatalogUseCase: GetCatalogUseCase
     let catalogViewModel: CatalogViewModel
     let audioPlayerManager: AudioPlayerManager
+    let gameOnePlayerViewModel: GameOnePlayerViewModel
 
     private init() {
         guard let baseUrl = Bundle.main.infoDictionary?["BASE_URL"] as? String else {
@@ -49,6 +50,16 @@ final class DependencyContainer {
             CatalogViewModel(getCatalogUseCase: getCatalogUseCase)
         }
 
+        func makeGameOnePlayerViewModel(
+            catalogViewModel: CatalogViewModel,
+            playerManager: AudioPlayerManager
+        ) -> GameOnePlayerViewModel {
+            GameOnePlayerViewModel(
+                catalogViewModel: catalogViewModel,
+                playerManager: playerManager
+            )
+        }
+
         networkClient = makeNetworkClient()
 
         trackService = makeTrackService(client: networkClient)
@@ -66,5 +77,7 @@ final class DependencyContainer {
         catalogViewModel = CatalogViewModel(getCatalogUseCase: getCatalogUseCase)
 
         audioPlayerManager = AudioPlayerManager(getPreviewUseCase: getTrackPreviewUseCase)
+
+        gameOnePlayerViewModel = makeGameOnePlayerViewModel(catalogViewModel: catalogViewModel, playerManager: audioPlayerManager)
     }
 }

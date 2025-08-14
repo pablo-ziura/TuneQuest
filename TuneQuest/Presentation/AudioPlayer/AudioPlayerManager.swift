@@ -14,6 +14,15 @@ final class AudioPlayerManager {
         self.getPreviewUseCase = getPreviewUseCase
     }
 
+    func trackInfo(for trackId: Int) async -> Track? {
+        do {
+            return try await getPreviewUseCase.execute(trackId: trackId)
+        } catch {
+            print("Error de red: \(error)")
+            return nil
+        }
+    }
+
     func loadPreview(trackId: Int) async {
         isLoading = true
         defer { isLoading = false }

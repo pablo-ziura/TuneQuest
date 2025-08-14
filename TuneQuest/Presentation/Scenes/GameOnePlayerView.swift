@@ -2,85 +2,114 @@ import SwiftUI
 
 struct GameOnePlayerView: View {
     @Environment(AudioPlayerManager.self) private var playerManager
-    @Environment(CatalogViewModel.self) private var viewModel
-    @State private var currentIndex = 0
+    @Environment(GameOnePlayerViewModel.self) private var viewModel
 
     var body: some View {
-        VStack(spacing: 32) {
-            if let track = playerManager.currentTrack {
-                VStack(spacing: 8) {
-                    if let cover = track.album?.coverBig, let url = URL(string: cover) {
-                        AsyncImage(url: url) { image in
-                            image.resizable().aspectRatio(contentMode: .fit)
-                        } placeholder: {
-                            ProgressView()
-                        }
-                        .frame(width: 200, height: 200)
-                        .cornerRadius(12)
+        VStack {
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach(viewModel.tracks, id: \.self) { track in
+                        TrackRowView(track: track)
+                            .frame(height: 80)
+                            .onDrag {
+                                viewModel.draggingTrack = track
+                                playerManager.stop()
+                                return NSItemProvider(object: NSString(string: track.id.map(String.init) ?? ""))
+                            }
+                            .onDrop(
+                                of: [.text],
+                                delegate: TrackDropDelegate(
+                                    item: track,
+                                    tracks: viewModel.bindable.tracks,
+                                    draggingTrack: viewModel.bindable.draggingTrack,
+                                    newCard: viewModel.bindable.newCard,
+                                    resetDragState: viewModel.resetDragState
+                                )
+                            )
                     }
-                    Text(track.title ?? "Título desconocido")
-                        .font(.title2)
-                        .multilineTextAlignment(.center)
-                    Text(track.artist?.name ?? "Artista desconocido")
-                        .font(.headline)
-                    if let year = track.releaseDate?.prefix(4) {
-                        Text(String(year))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
+                    // Drop area at the end of the list
+                    Color.clear
+                        .frame(height: 80)
+                        .onDrop(
+                            of: [.text],
+                            delegate: TrackDropDelegate(
+                                item: nil,
+                                tracks: viewModel.bindable.tracks,
+                                draggingTrack: viewModel.bindable.draggingTrack,
+                                newCard: viewModel.bindable.newCard,
+                                resetDragState: viewModel.resetDragState
+                            )
+                        )
                 }
-            } else {
-                ProgressView()
+                .padding()
             }
 
-            AudioPlayerManagerView()
-
-            HStack {
-                Button {
-                    Task { await previousTrack() }
-                } label: {
-                    Image(systemName: "backward.fill")
-                        .font(.title)
-                }
-                .disabled(currentIndex == 0)
-
-                Spacer()
-
-                Button {
-                    Task { await nextTrack() }
-                } label: {
-                    Image(systemName: "forward.fill")
-                        .font(.title)
-                }
-                .disabled(isLastTrack)
+            if let newCard = viewModel.newCard {
+                TrackRowView(track: newCard)
+                    .frame(height: 80)
+                    .padding(.horizontal)
+                    .onDrag {
+                        viewModel.draggingTrack = newCard
+                        playerManager.stop()
+                        return NSItemProvider(object: NSString(string: newCard.id.map(String.init) ?? ""))
+                    }
             }
-            .padding(.horizontal)
+
+            Button("New Card") {
+                Task { await viewModel.addNewCard() }
+            }
+            .disabled(!viewModel.canAddCard)
+            .padding()
         }
-        .padding()
-        .task {
-            await viewModel.fetchData()
-            await loadTrack(at: currentIndex)
-        }
+        .scrollDisabled(viewModel.draggingTrack != nil)
+        .task { await viewModel.loadInitialTrack() }
         .navigationTitle("One Player")
     }
+}
 
-    private var isLastTrack: Bool {
-        guard let ids = viewModel.catalog?.ids else { return true }
-        return currentIndex >= ids.count - 1
+private struct TrackDropDelegate: DropDelegate {
+    let item: Track?
+    @Binding var tracks: [Track]
+    @Binding var draggingTrack: Track?
+    @Binding var newCard: Track?
+    let resetDragState: () -> Void
+
+    func dropEntered(info: DropInfo) {
+        guard let draggingTrack else { return }
+
+        // Moving existing track within the list
+        if let fromIndex = tracks.firstIndex(of: draggingTrack) {
+            if let item, let toIndex = tracks.firstIndex(of: item), draggingTrack != item {
+                withAnimation {
+                    tracks.move(
+                        fromOffsets: IndexSet(integer: fromIndex),
+                        toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex
+                    )
+                }
+            } else if item == nil {
+                withAnimation {
+                    tracks.move(
+                        fromOffsets: IndexSet(integer: fromIndex),
+                        toOffset: tracks.count
+                    )
+                }
+            }
+        } else {
+            // Inserting a new track being dragged from the bottom
+            if let item, let toIndex = tracks.firstIndex(of: item) {
+                withAnimation { tracks.insert(draggingTrack, at: toIndex) }
+            } else if item == nil {
+                withAnimation { tracks.append(draggingTrack) }
+            }
+        }
     }
 
-    private func loadTrack(at index: Int) async {
-        guard let ids = viewModel.catalog?.ids, ids.indices.contains(index) else { return }
-        await playerManager.loadPreview(trackId: ids[index])
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
     }
 
-    private func nextTrack() async {
-        currentIndex += 1
-        await loadTrack(at: currentIndex)
-    }
-
-    private func previousTrack() async {
-        currentIndex -= 1
-        await loadTrack(at: currentIndex)
+    func performDrop(info: DropInfo) -> Bool {
+        resetDragState()
+        return true
     }
 }
