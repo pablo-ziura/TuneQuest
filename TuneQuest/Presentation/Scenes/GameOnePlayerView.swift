@@ -6,6 +6,13 @@ struct GameOnePlayerView: View {
 
     var body: some View {
         VStack {
+            HStack {
+                ForEach(0..<viewModel.lives, id: \.self) { _ in
+                    Image(systemName: "heart.fill")
+                        .foregroundColor(.red)
+                }
+            }
+
             ScrollView {
                 LazyVStack(spacing: 8) {
                     ForEach(viewModel.tracks, id: \.self) { track in
@@ -23,7 +30,7 @@ struct GameOnePlayerView: View {
                                     tracks: viewModel.bindable.tracks,
                                     draggingTrack: viewModel.bindable.draggingTrack,
                                     newCard: viewModel.bindable.newCard,
-                                    resetDragState: viewModel.resetDragState
+                                    onDropFinished: viewModel.finalizeDrop
                                 )
                             )
                     }
@@ -37,12 +44,13 @@ struct GameOnePlayerView: View {
                                 tracks: viewModel.bindable.tracks,
                                 draggingTrack: viewModel.bindable.draggingTrack,
                                 newCard: viewModel.bindable.newCard,
-                                resetDragState: viewModel.resetDragState
+                                onDropFinished: viewModel.finalizeDrop
                             )
                         )
                 }
                 .padding()
             }
+            .scrollDisabled(viewModel.draggingTrack != nil)
 
             if let newCard = viewModel.newCard {
                 TrackRowView(track: newCard)
@@ -61,9 +69,11 @@ struct GameOnePlayerView: View {
             .disabled(!viewModel.canAddCard)
             .padding()
         }
-        .scrollDisabled(viewModel.draggingTrack != nil)
         .task { await viewModel.loadInitialTrack() }
         .navigationTitle("One Player")
+        .alert(viewModel.alertTitle, isPresented: viewModel.bindable.showAlert) {
+            Button("OK", role: .cancel) { viewModel.alertTitle = "" }
+        }
     }
 }
 
@@ -72,7 +82,7 @@ private struct TrackDropDelegate: DropDelegate {
     @Binding var tracks: [Track]
     @Binding var draggingTrack: Track?
     @Binding var newCard: Track?
-    let resetDragState: () -> Void
+    let onDropFinished: () -> Void
 
     func dropEntered(info: DropInfo) {
         guard let draggingTrack else { return }
@@ -109,7 +119,7 @@ private struct TrackDropDelegate: DropDelegate {
     }
 
     func performDrop(info: DropInfo) -> Bool {
-        resetDragState()
+        onDropFinished()
         return true
     }
 }

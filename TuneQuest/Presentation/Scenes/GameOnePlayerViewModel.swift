@@ -11,6 +11,12 @@ final class GameOnePlayerViewModel {
     var newCard: Track?
     private var remainingIDs: [Int] = []
 
+    var lives = 5
+    var gameOver = false
+
+    var showAlert = false
+    var alertTitle = ""
+
     init(catalogViewModel: CatalogViewModel, playerManager: AudioPlayerManager) {
         self.catalogViewModel = catalogViewModel
         self.playerManager = playerManager
@@ -20,6 +26,8 @@ final class GameOnePlayerViewModel {
         await catalogViewModel.fetchData()
         remainingIDs = catalogViewModel.catalog?.ids ?? []
         tracks.removeAll()
+        lives = 5
+        gameOver = false
         if let track = await randomTrack() {
             tracks.append(track)
         }
@@ -37,11 +45,34 @@ final class GameOnePlayerViewModel {
     }
 
     var canAddCard: Bool {
-        newCard == nil && !remainingIDs.isEmpty
+        newCard == nil && !remainingIDs.isEmpty && !gameOver
     }
 
-    func resetDragState() {
-        draggingTrack = nil
-        newCard = nil
+    private func isTracksInOrder(_ tracks: [Track]) -> Bool {
+        let dates = tracks.map { $0.releaseDate ?? $0.album?.releaseDate ?? "" }
+        return dates == dates.sorted()
+    }
+
+    func finalizeDrop() {
+        guard let draggingTrack, !gameOver else { return }
+        if isTracksInOrder(tracks) {
+            alertTitle = "Great job!"
+            newCard = nil
+        } else {
+            if let index = tracks.firstIndex(of: draggingTrack) {
+                tracks.remove(at: index)
+            }
+            lives -= 1
+            if lives > 0 {
+                newCard = draggingTrack
+                alertTitle = "Wrong order"
+            } else {
+                newCard = nil
+                alertTitle = "Game over"
+                gameOver = true
+            }
+        }
+        showAlert = true
+        self.draggingTrack = nil
     }
 }
