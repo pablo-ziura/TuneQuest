@@ -6,22 +6,16 @@ struct GameOnePlayerView: View {
 
     var body: some View {
         VStack {
-            HStack {
-                ForEach(0 ..< viewModel.lives, id: \.self) { _ in
-                    Image(systemName: "heart.fill")
-                        .foregroundColor(.red)
-                }
-            }
-
             ScrollView {
                 LazyVStack(spacing: 8) {
                     // Drop area at the top of the list
-                    Color.red
-                        .frame(height: 180)
+                    Color.clear
+                        .frame(height: 80)
                         .onDrop(
                             of: [.text],
                             delegate: TrackDropDelegate(
                                 item: nil,
+                                index: 0,
                                 tracks: viewModel.bindable.tracks,
                                 draggingTrack: viewModel.bindable.draggingTrack,
                                 onDropFinished: viewModel.finalizeDrop
@@ -35,6 +29,7 @@ struct GameOnePlayerView: View {
                                 of: [.text],
                                 delegate: TrackDropDelegate(
                                     item: track,
+                                    index: nil,
                                     tracks: viewModel.bindable.tracks,
                                     draggingTrack: viewModel.bindable.draggingTrack,
                                     onDropFinished: viewModel.finalizeDrop
@@ -42,12 +37,13 @@ struct GameOnePlayerView: View {
                             )
                     }
                     // Drop area at the end of the list
-                    Color.red
-                        .frame(height: 180)
+                    Color.clear
+                        .frame(height: 80)
                         .onDrop(
                             of: [.text],
                             delegate: TrackDropDelegate(
                                 item: nil,
+                                index: viewModel.tracks.count,
                                 tracks: viewModel.bindable.tracks,
                                 draggingTrack: viewModel.bindable.draggingTrack,
                                 onDropFinished: viewModel.finalizeDrop
@@ -76,38 +72,36 @@ struct GameOnePlayerView: View {
         }
         .task { await viewModel.loadInitialTrack() }
         .navigationTitle("One Player")
-        .alert(viewModel.alertTitle, isPresented: viewModel.bindable.showAlert) {
-            Button("OK", role: .cancel) { viewModel.alertTitle = "" }
-        }
     }
 }
 
 private struct TrackDropDelegate: DropDelegate {
     let item: Track?
+    let index: Int?
     @Binding var tracks: [Track]
     @Binding var draggingTrack: Track?
     let onDropFinished: () -> Void
-
-    func dropEntered(info: DropInfo) {
-        guard let draggingTrack else { return }
-        // Remove previous temporary placement if the track already exists
-        if let fromIndex = tracks.firstIndex(of: draggingTrack) {
-            withAnimation { tracks.remove(at: fromIndex) }
-        }
-
-        // Insert the new card at the targeted position or at the end
-        if let item, let toIndex = tracks.firstIndex(of: item) {
-            withAnimation { tracks.insert(draggingTrack, at: toIndex) }
-        } else {
-            withAnimation { tracks.append(draggingTrack) }
-        }
-    }
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
         DropProposal(operation: .move)
     }
 
     func performDrop(info: DropInfo) -> Bool {
+        guard let draggingTrack else { return false }
+
+        let targetIndex: Int
+        if let index {
+            targetIndex = index
+        } else if let item, let toIndex = tracks.firstIndex(of: item) {
+            targetIndex = toIndex
+        } else {
+            targetIndex = tracks.count
+        }
+
+        withAnimation {
+            tracks.insert(draggingTrack, at: targetIndex)
+        }
+
         onDropFinished()
         return true
     }
