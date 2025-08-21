@@ -9,6 +9,7 @@ final class GameOnePlayerViewModel {
     var tracks: [Track] = []
     var draggingTrack: Track?
     var newCard: Track?
+    var dragOverIndex: Int?
     private var remainingIDs: [Int] = []
     
     init(catalogViewModel: CatalogViewModel, playerManager: AudioPlayerManager) {
@@ -43,5 +44,6 @@ final class GameOnePlayerViewModel {
     func finalizeDrop() {
         newCard = nil
         draggingTrack = nil
+        dragOverIndex = nil
     }
 }
