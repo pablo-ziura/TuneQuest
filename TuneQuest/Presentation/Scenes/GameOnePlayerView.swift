@@ -100,6 +100,7 @@ private struct TrackDropDelegate: DropDelegate {
 
     func performDrop(info: DropInfo) -> Bool {
         guard let draggingTrack else { return false }
+        defer { dragOverIndex = nil }
         var targetIndex = index
 
         if let fromIndex = tracks.firstIndex(of: draggingTrack) {
@@ -107,13 +108,41 @@ private struct TrackDropDelegate: DropDelegate {
             if fromIndex < targetIndex {
                 targetIndex -= 1
             }
+
+            withAnimation {
+                tracks.insert(draggingTrack, at: targetIndex)
+            }
+        } else {
+            let prevTrack = targetIndex > 0 ? tracks[targetIndex - 1] : nil
+            let nextTrack = targetIndex < tracks.count ? tracks[targetIndex] : nil
+
+            let currentReleaseDate = draggingTrack.releaseDate ?? ""
+
+            var isValid = true
+
+            if let prevTrack, let prevDate = prevTrack.releaseDate, !prevDate.isEmpty, !currentReleaseDate.isEmpty {
+                if prevDate > currentReleaseDate {
+                    isValid = false
+                }
+            }
+
+            if let nextTrack, let nextDate = nextTrack.releaseDate, !nextDate.isEmpty, !currentReleaseDate.isEmpty {
+                if nextDate < currentReleaseDate {
+                    isValid = false
+                }
+            }
+
+            if isValid {
+                print("🎶 User has placed the card CORRECTLY")
+                withAnimation {
+                    tracks.insert(draggingTrack, at: targetIndex)
+                }
+            } else {
+                print("🙉 User has placed the card INCORRECTLY")
+                return false
+            }
         }
 
-        withAnimation {
-            tracks.insert(draggingTrack, at: targetIndex)
-        }
-
-        dragOverIndex = nil
         onDropFinished()
         return true
     }
@@ -127,6 +156,7 @@ private struct DropIndicator: View {
             .fill(isActive ? Color.accentColor.opacity(0.5) : .clear)
             .frame(height: 4)
             .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
             .padding(.vertical, 2)
     }
 }

@@ -1,11 +1,3 @@
-//
-//  MockCatalogRepository.swift
-//  TuneQuest
-//
-//  Created by Pablo Ruiz Arnal on 12/8/25.
-//
-
-
 import Foundation
 @testable import TuneQuest
 
