@@ -1,11 +1,3 @@
-//
-//  MockCatalogRepository.swift
-//  TuneQuest
-//
-//  Created by Pablo Ruiz Arnal on 12/8/25.
-//
-
-
 import Foundation
 @testable import TuneQuest
 
@@ -13,6 +5,10 @@ final actor MockCatalogRepository: CatalogRepositoryProtocol, @unchecked Sendabl
     var result: Result<Catalog, Error>
 
     init(result: Result<Catalog, Error>) {
+        self.result = result
+    }
+
+    func setResult(_ result: Result<Catalog, Error>) {
         self.result = result
     }
 

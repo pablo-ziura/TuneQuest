@@ -1,0 +1,22 @@
+# macOS and per-user Xcode state
+.DS_Store
+xcuserdata/
+*.xcuserstate
+
+# Build and test output (keep shared schemes and test plans)
+.build/
+build/
+DerivedData/
+*.xcresult/
+*.xcarchive/
+*.ipa
+*.dSYM/
+
+# Local SwiftPM configuration
+.swiftpm/configuration/
+.swiftpm/xcode/package.xcworkspace/
+
+# Local credentials
+.netrc
+.env
+.env.local

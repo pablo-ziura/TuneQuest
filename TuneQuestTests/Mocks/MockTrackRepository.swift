@@ -8,6 +8,10 @@ final actor MockTrackRepository: TrackRepositoryProtocol, @unchecked Sendable {
         self.result = result
     }
 
+    func setResult(_ result: Result<Track, Error>) {
+        self.result = result
+    }
+
     func preview(for trackId: Int) async throws -> Track {
         switch result {
         case let .success(value):

@@ -6,12 +6,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack(path: router.pathBinding) {
-            VStack(spacing: 20) {
-                Text("Initial View")
-                Button("Go to Home") {
-                    router.push(.home)
-                }
-            }
+            coordinator.getHomeView()
             .navigationDestination(for: Route.self) { route in
                 coordinator.destination(for: route)
             }

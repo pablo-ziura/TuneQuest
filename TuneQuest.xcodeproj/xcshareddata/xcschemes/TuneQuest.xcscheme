@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1640"
+   LastUpgradeVersion = "2720"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -42,17 +42,6 @@
                BlueprintIdentifier = "A5971A6A2E37C69800A3F568"
                BuildableName = "TuneQuestTests.xctest"
                BlueprintName = "TuneQuestTests"
-               ReferencedContainer = "container:TuneQuest.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A5971A742E37C69800A3F568"
-               BuildableName = "TuneQuestUITests.xctest"
-               BlueprintName = "TuneQuestUITests"
                ReferencedContainer = "container:TuneQuest.xcodeproj">
             </BuildableReference>
          </TestableReference>
