@@ -5,6 +5,48 @@ import Testing
 @MainActor
 @Suite("AudioPlayerManager", .timeLimit(.minutes(1)))
 struct AudioPlayerManagerTests {
+    @Test("manual preparation stays silent and activates the audio session only on play")
+    func manualPlayback() async {
+        let repo = MockTrackRepository(result: .success(track(1, preview: "file:///preview.wav")))
+        let player = AVPlayer()
+        var activations = 0
+        let manager = AudioPlayerManager(
+            getPreviewUseCase: GetTrackPreviewUseCase(repository: repo), player: player,
+            configureSession: { activations += 1 }, deactivateSession: {}
+        )
+
+        await manager.loadPreview(trackId: 1, autoplay: false)
+        #expect(activations == 0)
+        #expect(player.currentItem != nil)
+        #expect(player.rate == 0)
+        #expect(manager.canPlay)
+
+        manager.play()
+        #expect(activations == 1)
+        manager.pause()
+        manager.play()
+        #expect(activations == 1)
+        manager.stop()
+        #expect(player.rate == 0)
+        manager.reset()
+    }
+
+    @Test("manual playback reports an activation failure without blocking the song metadata")
+    func manualActivationFailure() async {
+        let repo = MockTrackRepository(result: .success(track(1, preview: "file:///preview.wav")))
+        let manager = AudioPlayerManager(
+            getPreviewUseCase: GetTrackPreviewUseCase(repository: repo),
+            configureSession: { throw URLError(.unknown) }
+        )
+        await manager.loadPreview(trackId: 1, autoplay: false)
+        #expect(manager.errorMessage == nil)
+        manager.play()
+        #expect(manager.currentTrack?.id == 1)
+        #expect(manager.errorMessage != nil)
+        #expect(!manager.canPlay)
+        manager.reset()
+    }
+
     private func track(_ id: Int, preview: String? = nil) -> Track {
         Track(dto: TrackDTO(id: id, title: "Track \(id)", preview: preview))
     }

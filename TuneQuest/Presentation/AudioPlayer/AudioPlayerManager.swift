@@ -54,9 +54,10 @@ final class AudioPlayerManager {
         notificationObservers.forEach { NotificationCenter.default.removeObserver($0) }
     }
 
-    func loadPreview(trackId: Int) async {
+    func loadPreview(trackId: Int, autoplay: Bool = true) async {
         guard !Task.isCancelled else { return }
         clearPreview()
+        releaseAudioSession()
         let id = loadID
         isLoading = true
         defer {
@@ -72,13 +73,12 @@ final class AudioPlayerManager {
                 releaseAudioSession()
                 return
             }
-            try configureSession()
-            isSessionActive = true
+            if autoplay { try activateAudioSession() }
 
             let item = AVPlayerItem(url: url)
             observe(item, loadID: id)
             player.replaceCurrentItem(with: item)
-            player.play()
+            if autoplay { player.play() }
             updatePlaybackState()
         } catch {
             guard loadID == id, !Task.isCancelled, !(error is CancellationError) else { return }
@@ -98,6 +98,13 @@ final class AudioPlayerManager {
 
     func play() {
         guard canPlay else { return }
+        do {
+            try activateAudioSession()
+        } catch {
+            failPlayback()
+            logger.error("Audio session activation failed: \(error.localizedDescription, privacy: .public)")
+            return
+        }
         if hasFinished {
             player.seek(to: .zero)
             hasFinished = false
@@ -189,5 +196,11 @@ final class AudioPlayerManager {
         } catch {
             logger.error("Audio session deactivation failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    private func activateAudioSession() throws {
+        guard !isSessionActive else { return }
+        try configureSession()
+        isSessionActive = true
     }
 }
