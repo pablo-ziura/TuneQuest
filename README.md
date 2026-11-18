@@ -1,17 +1,26 @@
 # TuneQuest
 
-**Work in progress.** A personal iOS music-game project, currently implemented as a small catalog and audio-preview prototype. Guessing rounds and scoring do not exist yet.
+An iOS music game: place songs on a timeline by their original release year. This first playable version focuses on single-player games.
 
-## Try the current slice
+## Play a solo game
 
-Open the app → **Explore catalog** → listen to a preview → pause, stop or replay → move between three tracks → return home.
+Open the app → **Play solo** → choose a gap → **Confirm**.
 
-- A bundled JSON catalog supplies the track IDs; Deezer supplies metadata, artwork and audio previews.
-- Previews start automatically on entry and when changing tracks. Playback stops when leaving the catalog.
-- Loading, empty-catalog, unavailable-preview and recoverable-error states are explicit. Missing artwork has a placeholder.
-- Multiplayer and settings remain placeholders in the source and have no entry points in the app.
+- Start with one reference song and its visible year. Place ten more songs correctly to win.
+- You have three lives. A wrong answer costs one life and keeps the same song, with its year hidden, for another attempt.
+- Title and artist are always visible. Tap **Play** to hear a preview; playback never starts automatically.
+- Songs from the same year can go in either order as long as the timeline remains chronological.
+- After a correct answer, the year is revealed. Tap **Continue** for the next song.
+- The third incorrect answer ends the game and reveals the pending song's year and correct position. **Play again** starts a fresh game; **Home** returns to the rules.
+- **Exit** asks for confirmation before abandoning an active game. Games are not saved between visits or app launches.
 
-Internet access is required. **No account, API key or secret configuration is needed.** There is no offline/demo mode; the mocks are test doubles, not an app data source. Deezer availability and preview rights can vary by track, region and time.
+The bundled catalog contains twenty international recordings from 1957–2022. Each game randomly selects eleven distinct entries. Titles, artists and reviewed original release years are local; gameplay can continue without a working preview or artwork. Internet access is required for Deezer audio and images. **No account, API key or secret configuration is needed.** Availability and preview rights can vary by track, region and time.
+
+### Release-year policy
+
+The answer is the first publication year of the selected recording, including an album release that preceded its single. Remasters and compilations retain the original recording's year. For example, “Billie Jean” uses 1982 (the album *Thriller*), and “Hotel California” uses 1976 (the album), rather than their later single dates. Deezer's `release_date` is not used for gameplay.
+
+Every entry in [catalog.json](TuneQuest/catalog.json) includes `originalReleaseYear` and a `releaseYearSource` link. When changing the catalog, verify the artist and recording behind the Deezer ID, exclude live versions/remixes/re-recordings unless explicitly curated, and check the first publication year against the cited source. Metadata for all twenty IDs and the presence of preview URLs were checked on 18 November 2026; this does not guarantee future availability.
 
 ## Requirements and running
 
@@ -56,24 +65,31 @@ xcodebuild -project TuneQuest.xcodeproj -scheme TuneQuest -testPlan TestPlan \
   -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test
 ```
 
-The tests use Swift Testing, repository doubles and a URLProtocol stub; they require no Deezer access. They cover catalog loading/mapping, use cases, preview error recovery and cancellation, audio cleanup, and HTTP GET/POST behavior. They do not constitute a UI or accessibility test suite.
+The tests use Swift Testing, repository doubles and a URLProtocol stub. The committed suite requires no Deezer access and covers:
 
-Verified on 16 November 2026: simulator build and all **30 tests** passed (24 app, 6 package; 31 executed cases including parameterized inputs), with no failures or skipped tests. A separate temporary hosted integration probe exercised real Deezer playback, pause, natural completion, replay, stop and return/reentry. The presentation views were also inspected with repository doubles in Dark Mode at the largest accessibility text size, including scrolling to the controls. The temporary probe is not part of the delivered test suite.
+- Chronological insertion, equal years, invalid positions, retries, lives, victory, defeat and repeated confirmations.
+- Distinct game selection, catalog validation, failures, cancellation and overlapping session loads.
+- Audio-independent answers, manual preview preparation, audio-session activation, stale preview responses and cleanup.
+- Catalog mapping and bundled data, use cases, playback recovery and HTTP GET/POST behavior.
 
-Touch-driven previous/next navigation, VoiceOver, Voice Control, hardware audio interruptions, physical devices, iOS 18 and non-iOS destinations have not been manually verified. Audio was checked through AVPlayer state, not a human listening test. The layout review is not a full accessibility audit.
+Verified on 18 November 2026: simulator build and all **49 tests** passed (43 app, 6 package), with no failures or skipped tests. Temporary hosted rendering probes exercised the game state flow through selection, correct/incorrect feedback, victory, defeat and restart. Their screenshots were inspected at a 375 × 667-point viewport, including the largest accessibility text size in Dark Mode. The probes are not part of the committed suite and are not touch-driven UI tests.
+
+The views use semantic controls, accessible position descriptions, selected-state traits, result announcements and a scrolling layout for accessibility text sizes or limited height. Touch-driven navigation/confirmation/exit, VoiceOver focus and announcements, Voice Control, physical devices, iOS 18, hardware audio interruptions and human listening have not been manually verified for this feature. These remain device-validation tasks; the layout inspection is not a full accessibility audit.
 
 ## Architecture
 
 SwiftUI presentation uses Observation and `@MainActor` state. [DependencyContainer](TuneQuest/DependencyContainer.swift) composes concrete dependencies; [AppCoordinator](TuneQuest/AppCoordinator.swift) injects them and resolves routes for the NavigationStack.
 
-- **Catalog:** [CatalogViewModel](TuneQuest/Presentation/Scenes/CatalogViewModel.swift) → [GetCatalogUseCase](TuneQuest/Domain/UseCase/GetCatalogUseCase.swift) → repository → [CatalogLocalDataSource](TuneQuest/Data/DataSource/CatalogLocalDataSource.swift) → bundled [catalog.json](TuneQuest/catalog.json).
-- **Previews:** [AudioPlayerManager](TuneQuest/Presentation/AudioPlayer/AudioPlayerManager.swift) → [GetTrackPreviewUseCase](TuneQuest/Domain/UseCase/GetTrackPreviewUseCase.swift) → [TrackRepository](TuneQuest/Data/Repository/TrackRepository.swift) → [TrackService](TuneQuest/Data/Service/TrackService.swift). AVPlayer handles audio; AsyncImage handles artwork.
-- **TuneNetwork:** a reusable URLSession HTTP client with a Sendable [protocol](Packages/TuneNetwork/Sources/TuneNetwork/NetworkClientProtocol.swift), generic JSON decoding, GET/POST and status-code errors. `TrackService` calls `get(endpoint: "track/\(id)", params: nil, headers: nil)`; [URLProtocol-based tests](Packages/TuneNetwork/Tests/TuneNetworkTests/NetworkClientTests.swift) isolate transport from the live API.
+- **Game:** [GameOnePlayerViewModel](TuneQuest/Presentation/Scenes/GameOnePlayerViewModel.swift) → [StartSinglePlayerGameUseCase](TuneQuest/Domain/UseCase/StartSinglePlayerGameUseCase.swift) → catalog repository. [GameSession](TuneQuest/Domain/Model/GameSession.swift) is a value-type state machine with no UI, networking or audio dependency. `GameConfiguration` centralizes the default three lives and ten correct placements.
+- **Catalog:** repository → [CatalogLocalDataSource](TuneQuest/Data/DataSource/CatalogLocalDataSource.swift) → bundled JSON v2. Each `CatalogEntry` includes the Deezer ID, title, artist, reviewed year and source. The previous IDs-only bundle format is replaced; there is no persisted user data to migrate.
+- **Previews:** [AudioPlayerManager](TuneQuest/Presentation/AudioPlayer/AudioPlayerManager.swift) → `GetTrackPreviewUseCase` → `TrackRepository` → `TrackService`. `loadPreview(trackId:autoplay:)` preserves autoplay by default; the game explicitly disables it. AVPlayer handles audio and AsyncImage handles artwork. Game results always use local catalog data.
+- **Lifecycle:** the container creates a new view model and player for each game screen. Starting/restarting or leaving invalidates pending work. Confirming pauses playback; finishing/leaving releases it. Backgrounding pauses without automatically resuming.
+- **TuneNetwork:** a local URLSession HTTP package with a Sendable protocol, generic JSON decoding, GET/POST and status-code errors. URLProtocol-based tests isolate transport from the live API.
 
-The layers are folders within one app target, not separate architectural modules. DTO-to-domain mapping currently lives in domain-model extensions; the container is a singleton. These are existing tradeoffs, not claims of complete architectural isolation. Legacy `GameOnePlayerView` naming reflects the intended product; its current behavior is catalog playback.
+The layers are folders within one app target, not separate architectural modules. DTO-to-domain mapping currently lives in domain-model extensions and the composition container is a singleton. These are existing tradeoffs. The catalog-only presentation model remains in source with its regression tests; it is no longer an app entry point. Multiplayer and settings remain placeholders without home-screen entry points.
 
 ## Roadmap
 
-**Available today:** three-track catalog browsing, metadata/artwork, audio previews and basic playback controls, recoverable presentation states, unit tests.
+**Available today:** a complete solo timeline game, twenty curated songs, three lives, ten correct placements to win, same-song retries, results/replay, optional manual audio previews, recoverable media errors and unit tests.
 
-**Future work:** guessing rounds and scoring; multiplayer and settings; broader UI/accessibility/device coverage; interruption/background-audio behavior and visual identity. Offline playback, persistence and search are not implemented.
+**Future work:** device and assistive-technology validation, difficulty tuning, persistence, broader catalog coverage, visual identity, multiplayer and settings. There is no timer, extra scoring, difficulty selector, downloaded audio or background playback mode.
