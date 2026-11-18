@@ -27,11 +27,9 @@ final class AppCoordinator {
     }
 
     func getGameOnePlayerView() -> some View {
-        GameOnePlayerView()
+        GameOnePlayerView(viewModel: container.makeSinglePlayerViewModel())
             .environment(self)
             .environment(router)
-            .environment(container.audioPlayerManager)
-            .environment(container.catalogViewModel)
     }
 
     func getGameMultiplayerView() -> some View {

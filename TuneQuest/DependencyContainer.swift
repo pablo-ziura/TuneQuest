@@ -15,8 +15,6 @@ final class DependencyContainer {
     let catalogDataSource: CatalogDataSourceProtocol
     let catalogRepository: CatalogRepositoryProtocol
     let getCatalogUseCase: GetCatalogUseCase
-    let catalogViewModel: CatalogViewModel
-    let audioPlayerManager: AudioPlayerManager
 
     func makeSinglePlayerViewModel() -> GameOnePlayerViewModel {
         GameOnePlayerViewModel(
@@ -52,10 +50,6 @@ final class DependencyContainer {
             CatalogRepository(dataSource: dataSource)
         }
 
-        func makeCatalogViewModel(getCatalogUseCase: GetCatalogUseCase) -> CatalogViewModel {
-            CatalogViewModel(getCatalogUseCase: getCatalogUseCase)
-        }
-
         networkClient = makeNetworkClient()
 
         trackService = makeTrackService(client: networkClient)
@@ -70,8 +64,5 @@ final class DependencyContainer {
 
         getCatalogUseCase = GetCatalogUseCase(repository: catalogRepository)
 
-        catalogViewModel = CatalogViewModel(getCatalogUseCase: getCatalogUseCase)
-
-        audioPlayerManager = AudioPlayerManager(getPreviewUseCase: getTrackPreviewUseCase)
     }
 }
