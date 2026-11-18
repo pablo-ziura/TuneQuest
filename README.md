@@ -28,7 +28,7 @@ Every entry in [catalog.json](TuneQuest/catalog.json) includes `originalReleaseY
 - iOS **18.0** deployment target. This repository is evaluated as an iOS app; macOS and visionOS are not validated.
 - The local package requires **Swift tools 6.1+**. The app uses Swift 5 language mode; TuneNetwork uses Swift 6.
 - Verified on **Xcode 27.2 (27B52), Swift 6.4.2**, with an **iPhone 17 / iOS 26.5** simulator. Older Xcode versions and physical devices have not been verified.
-- No third-party dependencies: `Packages/TuneNetwork` is a local Swift package.
+- No third-party dependencies: `Packages/TuneNetwork` is registered as a local Swift package under the project's **Package Dependencies**.
 
 Open `TuneQuest.xcodeproj`, select the shared **TuneQuest** scheme and an iPhone simulator, then Run (`⌘R`). `BASE_URL` is already set to `https://api.deezer.com` in [Info.plist](TuneQuest/Info.plist). Simulator builds do not need a signing team; running on a physical device requires your own signing configuration.
 
@@ -56,13 +56,17 @@ xcrun simctl launch "$TUNEQUEST_SIMULATOR_ID" Pablo.Ruiz.TuneQuest
 
 ## Tests and verification
 
-In Xcode, use `⌘U` with the **TuneQuest** scheme and **TestPlan**. The single shared [test plan](TestPlan.xctestplan) includes both TuneQuestTests and TuneNetworkTests:
+In Xcode, use `⌘U` with the **TuneQuest** scheme and **TestPlan**. The shared [test plan](TuneQuest/TestPlan.xctestplan) includes TuneQuestTests. Run TuneNetworkTests through the local package's own scheme; its tests are not exposed to the host plan with the Package Dependencies setup:
 
 ```sh
 xcodebuild -project TuneQuest.xcodeproj -scheme TuneQuest -testPlan TestPlan \
   -destination "platform=iOS Simulator,id=$TUNEQUEST_SIMULATOR_ID" \
   -derivedDataPath /tmp/TuneQuest-portfolio-final \
   -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test
+
+(cd Packages/TuneNetwork && xcodebuild -scheme TuneNetwork \
+  -destination "platform=iOS Simulator,id=$TUNEQUEST_SIMULATOR_ID" \
+  -derivedDataPath /tmp/TuneQuest-network-verification CODE_SIGNING_ALLOWED=NO test)
 ```
 
 The tests use Swift Testing, repository doubles and a URLProtocol stub. The committed suite requires no Deezer access and covers:
