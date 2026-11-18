@@ -23,15 +23,14 @@
 /* Begin PBXFileReference section */
 		A5971A5B2E37C69700A3F568 /* TuneQuest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneQuest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5971A6B2E37C69800A3F568 /* TuneQuestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneQuestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A5971AA92E37CE3300A3F568 /* TuneNetwork */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TuneNetwork; path = Packages/TuneNetwork; sourceTree = "<group>"; };
-		A5971AAE2E37E2DC00A3F568 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A55DE4612E3A4A7E006AAF64 /* Exceptions for "TuneQuest" folder in "TuneQuest" target */ = {
+		A55DE4612E3A4A7E006AAF64 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				TestPlan.xctestplan,
 			);
 			target = A5971A5A2E37C69700A3F568 /* TuneQuest */;
 		};
@@ -41,7 +40,7 @@
 		A5971A5D2E37C69700A3F568 /* TuneQuest */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A55DE4612E3A4A7E006AAF64 /* Exceptions for "TuneQuest" folder in "TuneQuest" target */,
+				A55DE4612E3A4A7E006AAF64 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
 			path = TuneQuest;
 			sourceTree = "<group>";
@@ -75,8 +74,6 @@
 		A5971A522E37C69700A3F568 = {
 			isa = PBXGroup;
 			children = (
-				A5971AAE2E37E2DC00A3F568 /* TestPlan.xctestplan */,
-				A5971AA92E37CE3300A3F568 /* TuneNetwork */,
 				A5971A5D2E37C69700A3F568 /* TuneQuest */,
 				A5971A6E2E37C69800A3F568 /* TuneQuestTests */,
 				A5971AAA2E37CEC800A3F568 /* Frameworks */,
@@ -177,6 +174,9 @@
 			);
 			mainGroup = A5971A522E37C69700A3F568;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DA2F324230ADFF2B00C72702 /* XCLocalSwiftPackageReference "Packages/TuneNetwork" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A5971A5C2E37C69700A3F568 /* Products */;
 			projectDirPath = "";
@@ -528,6 +528,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		DA2F324230ADFF2B00C72702 /* XCLocalSwiftPackageReference "Packages/TuneNetwork" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/TuneNetwork;
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		A5971AAB2E37CECC00A3F568 /* TuneNetwork */ = {
