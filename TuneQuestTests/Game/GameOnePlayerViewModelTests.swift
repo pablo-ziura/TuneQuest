@@ -5,6 +5,45 @@ import Testing
 @MainActor
 @Suite("GameOnePlayerViewModel")
 struct GameOnePlayerViewModelTests {
+    @Test("an older start cannot replace a newer game or finish its loading state")
+    func overlappingStarts() async {
+        let repo = SequencedCatalogRepository()
+        let vm = makeModel(repository: repo)
+        let first = Task { await vm.start() }
+        await repo.waitUntilRequested(1)
+        let second = Task { await vm.start() }
+        await repo.waitUntilRequested(2)
+        await repo.complete(1, with: Catalog(entries: [gameEntry(1), gameEntry(2)]))
+        await first.value
+        #expect(vm.session == nil)
+        #expect(vm.isLoading)
+        await repo.complete(2, with: Catalog(entries: [gameEntry(3), gameEntry(4)]))
+        await second.value
+        #expect(vm.session?.timeline.first?.id == 3)
+        #expect(!vm.isLoading)
+    }
+
+    @Test("a preview completing after game over cannot restore audio metadata")
+    func gameOverDiscardsPreview() async {
+        let catalog = MockCatalogRepository(result: .success(Catalog(entries: [gameEntry(1), gameEntry(2)])))
+        let tracks = SuspendedTrackRepository()
+        let vm = GameOnePlayerViewModel(
+            startGame: StartSinglePlayerGameUseCase(repository: catalog,
+                configuration: .init(targetCorrectPlacements: 1), shuffle: { $0 }),
+            player: AudioPlayerManager(getPreviewUseCase: GetTrackPreviewUseCase(repository: tracks))
+        )
+        await vm.start()
+        let preview = Task { await vm.preparePreview() }
+        await tracks.waitUntilRequested(2)
+        vm.selectPosition(1)
+        vm.confirm()
+        await tracks.complete(2, with: Track(dto: TrackDTO(id: 2, preview: "file:///preview.wav")))
+        await preview.value
+        #expect(vm.session?.phase == .won)
+        #expect(vm.player.currentTrack == nil)
+        #expect(!vm.player.canPlay)
+    }
+
     private func makeModel(repository: CatalogRepositoryProtocol) -> GameOnePlayerViewModel {
         GameOnePlayerViewModel(
             startGame: StartSinglePlayerGameUseCase(repository: repository,

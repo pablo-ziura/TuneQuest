@@ -6,8 +6,15 @@ import Testing
 @Suite("AudioPlayerManager", .timeLimit(.minutes(1)))
 struct AudioPlayerManagerTests {
     @Test("manual preparation stays silent and activates the audio session only on play")
-    func manualPlayback() async {
-        let repo = MockTrackRepository(result: .success(track(1, preview: "file:///preview.wav")))
+    func manualPlayback() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("preview-\(UUID()).wav")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let format = try #require(AVAudioFormat(standardFormatWithSampleRate: 8_000, channels: 1))
+        let buffer = try #require(AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 8_000))
+        buffer.frameLength = 8_000
+        buffer.floatChannelData?[0].update(repeating: 0, count: Int(buffer.frameLength))
+        try AVAudioFile(forWriting: url, settings: format.settings).write(from: buffer)
+        let repo = MockTrackRepository(result: .success(track(1, preview: url.absoluteString)))
         let player = AVPlayer()
         var activations = 0
         let manager = AudioPlayerManager(

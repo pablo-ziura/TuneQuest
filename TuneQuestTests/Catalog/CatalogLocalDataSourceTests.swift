@@ -24,8 +24,8 @@ final class CatalogLocalDataSourceTests: @unchecked Sendable {
         let json =
             """
             {
-            "version":1,
-            "modified":"2025-08-11",
+            "version":2,
+            "modified":"2026-11-18",
             "entries":[
               {"id":1,"title":"Track 1","artist":"Artist 1","originalReleaseYear":2000,"releaseYearSource":"https://example.com/1"},
               {"id":2,"title":"Track 2","artist":"Artist 2","originalReleaseYear":2000,"releaseYearSource":"https://example.com/2"}
@@ -55,7 +55,7 @@ final class CatalogLocalDataSourceTests: @unchecked Sendable {
 }
 
 func catalogDTOFixture() -> CatalogDTO {
-    CatalogDTO(version: 1, modified: "2025-08-11", entries: [1, 2].map {
+    CatalogDTO(version: 2, modified: "2026-11-18", entries: [1, 2].map {
         let entry = gameEntry($0)
         return CatalogEntryDTO(id: entry.id, title: entry.title, artist: entry.artist,
                                originalReleaseYear: entry.originalReleaseYear, releaseYearSource: entry.releaseYearSource)
