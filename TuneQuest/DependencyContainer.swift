@@ -18,6 +18,13 @@ final class DependencyContainer {
     let catalogViewModel: CatalogViewModel
     let audioPlayerManager: AudioPlayerManager
 
+    func makeSinglePlayerViewModel() -> GameOnePlayerViewModel {
+        GameOnePlayerViewModel(
+            startGame: StartSinglePlayerGameUseCase(repository: catalogRepository),
+            player: AudioPlayerManager(getPreviewUseCase: getTrackPreviewUseCase)
+        )
+    }
+
     private init() {
         guard let baseUrl = Bundle.main.infoDictionary?["BASE_URL"] as? String else {
             fatalError("Entry not found for BASE_URL")
