@@ -29,6 +29,7 @@ struct GameOnePlayerView: View {
                 } actions: {
                     Button("Retry") { startAttempt += 1 }
                         .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
                 }
             } else {
                 ProgressView("Preparing your timeline…")
@@ -194,6 +195,7 @@ struct GameOnePlayerView: View {
                     .foregroundStyle(.secondary)
                 Button("Continue", action: viewModel.advance)
                     .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             } else {
                 pendingTrack(game.pendingTrack)
@@ -205,6 +207,7 @@ struct GameOnePlayerView: View {
                         .foregroundStyle(.secondary)
                     Button("Try again", action: viewModel.advance)
                         .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
                 } else {
                     previewControls
                     if let index = viewModel.selectedPosition {
@@ -220,6 +223,7 @@ struct GameOnePlayerView: View {
                         Text("Confirm").frame(maxWidth: .infinity, minHeight: 30)
                     }
                     .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
                     .disabled(!viewModel.canConfirm)
                 }
             }
@@ -261,6 +265,7 @@ struct GameOnePlayerView: View {
                     .foregroundStyle(.secondary)
                 Button("Retry audio", action: viewModel.retryPreview)
                     .buttonStyle(.bordered)
+                    .controlSize(.large)
             } else {
                 HStack(spacing: 20) {
                     Button(action: viewModel.player.togglePlayback) {
@@ -300,8 +305,10 @@ struct GameOnePlayerView: View {
                 VStack(spacing: 12) {
                     Button("Play again") { startAttempt += 1 }
                         .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
                     Button("Home") { router.popToRoot() }
                         .buttonStyle(.bordered)
+                        .controlSize(.large)
                 }
                 .frame(maxWidth: .infinity)
                 timeline(game, interactive: false)
