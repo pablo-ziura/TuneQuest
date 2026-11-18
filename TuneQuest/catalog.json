@@ -1,9 +1,146 @@
 {
-  "version": 1,
-  "modified": "2025-08-11",
-  "ids": [
-    116348656,
-    3135556,
-    1109731
+  "version": 2,
+  "modified": "2026-11-18",
+  "entries": [
+    {
+      "id": 6596867,
+      "title": "Jailhouse Rock",
+      "artist": "Elvis Presley",
+      "originalReleaseYear": 1957,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Jailhouse_Rock_(song)"
+    },
+    {
+      "id": 540188862,
+      "title": "Johnny B. Goode",
+      "artist": "Chuck Berry",
+      "originalReleaseYear": 1958,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Johnny_B._Goode"
+    },
+    {
+      "id": 669799,
+      "title": "Stand by Me",
+      "artist": "Ben E. King",
+      "originalReleaseYear": 1961,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Stand_by_Me_(Ben_E._King_song)"
+    },
+    {
+      "id": 904732,
+      "title": "Respect",
+      "artist": "Aretha Franklin",
+      "originalReleaseYear": 1967,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Respect_(song)"
+    },
+    {
+      "id": 116348656,
+      "title": "Let It Be",
+      "artist": "The Beatles",
+      "originalReleaseYear": 1970,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Let_It_Be_(song)"
+    },
+    {
+      "id": 4091937401,
+      "title": "Bohemian Rhapsody",
+      "artist": "Queen",
+      "originalReleaseYear": 1975,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Bohemian_Rhapsody"
+    },
+    {
+      "id": 884025,
+      "title": "Dancing Queen",
+      "artist": "ABBA",
+      "originalReleaseYear": 1976,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Dancing_Queen"
+    },
+    {
+      "id": 426703682,
+      "title": "Hotel California",
+      "artist": "Eagles",
+      "originalReleaseYear": 1976,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Hotel_California"
+    },
+    {
+      "id": 461043312,
+      "title": "Heroes",
+      "artist": "David Bowie",
+      "originalReleaseYear": 1977,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/%22Heroes%22_(David_Bowie_song)"
+    },
+    {
+      "id": 831313,
+      "title": "Billie Jean",
+      "artist": "Michael Jackson",
+      "originalReleaseYear": 1982,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Thriller_(album)"
+    },
+    {
+      "id": 13791930,
+      "title": "Smells Like Teen Spirit",
+      "artist": "Nirvana",
+      "originalReleaseYear": 1991,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Smells_Like_Teen_Spirit"
+    },
+    {
+      "id": 985985832,
+      "title": "Wonderwall",
+      "artist": "Oasis",
+      "originalReleaseYear": 1995,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Wonderwall_(song)"
+    },
+    {
+      "id": 3133738,
+      "title": "Wannabe",
+      "artist": "Spice Girls",
+      "originalReleaseYear": 1996,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Wannabe"
+    },
+    {
+      "id": 540175,
+      "title": "...Baby One More Time",
+      "artist": "Britney Spears",
+      "originalReleaseYear": 1998,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/...Baby_One_More_Time_(song)"
+    },
+    {
+      "id": 3135556,
+      "title": "Harder, Better, Faster, Stronger",
+      "artist": "Daft Punk",
+      "originalReleaseYear": 2001,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Harder,_Better,_Faster,_Stronger"
+    },
+    {
+      "id": 1109731,
+      "title": "Lose Yourself",
+      "artist": "Eminem",
+      "originalReleaseYear": 2002,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Lose_Yourself"
+    },
+    {
+      "id": 8086126,
+      "title": "Rolling in the Deep",
+      "artist": "Adele",
+      "originalReleaseYear": 2010,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Rolling_in_the_Deep"
+    },
+    {
+      "id": 908604612,
+      "title": "Blinding Lights",
+      "artist": "The Weeknd",
+      "originalReleaseYear": 2019,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Blinding_Lights"
+    },
+    {
+      "id": 1124841652,
+      "title": "Don't Start Now",
+      "artist": "Dua Lipa",
+      "originalReleaseYear": 2019,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/Don%27t_Start_Now"
+    },
+    {
+      "id": 1703487577,
+      "title": "As It Was",
+      "artist": "Harry Styles",
+      "originalReleaseYear": 2022,
+      "releaseYearSource": "https://en.wikipedia.org/wiki/As_It_Was"
+    }
   ]
 }

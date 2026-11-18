@@ -7,7 +7,7 @@ import Testing
 final class GetCatalogUseCaseTests: @unchecked Sendable {
     @Test("execute returns repository catalog")
     func executeSuccess() async throws {
-        let catalog = Catalog(ids: [1, 2])
+        let catalog = Catalog(entries: [gameEntry(1), gameEntry(2)])
         let repo = MockCatalogRepository(result: .success(catalog))
         let sut = GetCatalogUseCase(repository: repo)
 

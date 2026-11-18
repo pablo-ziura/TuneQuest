@@ -6,12 +6,12 @@ import Testing
 final class CatalogRepositoryTests: @unchecked Sendable {
     @Test("fetchCatalog maps DTO to domain model")
     func fetchCatalogSuccess() async throws {
-        let dto = CatalogDTO(version: 1, modified: "2025-08-11", ids: [1, 2])
+        let dto = catalogDTOFixture()
         let dataSource = MockCatalogDataSource(result: .success(dto))
         let sut = CatalogRepository(dataSource: dataSource)
 
         let result = try await sut.fetchCatalog()
-        #expect(result == Catalog(ids: [1, 2]))
+        #expect(result == Catalog(entries: [gameEntry(1), gameEntry(2)]))
     }
 
     @Test("fetchCatalog propagates errors")

@@ -7,7 +7,7 @@ import Testing
 final class CatalogViewModelTests: @unchecked Sendable {
     @Test("fetchData populates catalog and toggles loading")
     func fetchDataSuccess() async throws {
-        let catalog = Catalog(ids: [1, 2])
+        let catalog = Catalog(entries: [gameEntry(1), gameEntry(2)])
         let repo = MockCatalogRepository(result: .success(catalog))
         let useCase = GetCatalogUseCase(repository: repo)
         let vm = CatalogViewModel(getCatalogUseCase: useCase)
@@ -38,10 +38,10 @@ final class CatalogViewModelTests: @unchecked Sendable {
         await vm.fetchData()
         #expect(vm.errorMessage != nil)
 
-        await repo.setResult(.success(Catalog(ids: [])))
+        await repo.setResult(.success(Catalog(entries: [])))
         await vm.fetchData()
 
-        #expect(vm.catalog == Catalog(ids: []))
+        #expect(vm.catalog == Catalog(entries: []))
         #expect(vm.errorMessage == nil)
         #expect(!vm.isLoading)
     }
@@ -55,7 +55,7 @@ final class CatalogViewModelTests: @unchecked Sendable {
         #expect(vm.isLoading)
 
         vm.cancelLoading()
-        await repo.complete(with: Catalog(ids: [1]))
+        await repo.complete(with: Catalog(entries: [gameEntry(1)]))
         await task.value
 
         #expect(vm.catalog == nil)
@@ -70,7 +70,7 @@ final class CatalogViewModelTests: @unchecked Sendable {
         let task = Task { await vm.fetchData() }
         await repo.waitUntilRequested()
         task.cancel()
-        await repo.complete(with: Catalog(ids: [1]))
+        await repo.complete(with: Catalog(entries: [gameEntry(1)]))
         await task.value
 
         #expect(vm.catalog == nil)
