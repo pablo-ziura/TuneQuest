@@ -56,7 +56,7 @@ xcodebuild -project TuneQuest.xcodeproj -scheme TuneQuest -testPlan TestPlan \
   -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test
 ```
 
-To run the package suite independently, use its own scheme, as the CI workflow also does:
+To run the package suite independently, use its own scheme:
 
 ```sh
 (cd Packages/TuneNetwork && xcodebuild -scheme TuneNetwork \
@@ -64,7 +64,7 @@ To run the package suite independently, use its own scheme, as the CI workflow a
   -derivedDataPath /tmp/TuneQuest-network-verification CODE_SIGNING_ALLOWED=NO test)
 ```
 
-With the current shared plan, the package tests also run during the app-scheme test step. The standalone package step verifies its own scheme; it does not represent additional unique tests.
+CI runs both suites once through the shared plan. The standalone command verifies the package's own scheme when needed; it does not represent additional unique tests.
 
 The tests use Swift Testing, repository doubles and a URLProtocol stub; they require no Deezer access. They cover catalog loading/mapping, use cases, preview error recovery and cancellation, audio cleanup, and HTTP GET/POST behavior. They do not constitute a UI or accessibility test suite.
 
@@ -83,13 +83,21 @@ the workflow is present on GitHub's default branch.
 The workflow selects Xcode 27.2 and an iPhone 17 / iOS 27.2 simulator on GitHub's
 `xcode-27` runner. It performs these steps:
 
-1. Build the `TuneQuest` app for the simulator.
-2. Run tests with the shared `TuneQuest` scheme and `TestPlan`.
-3. Run package tests through the `TuneNetwork` scheme in `Packages/TuneNetwork`.
-4. Upload available `.xcresult` bundles, including after failure, for seven days.
+1. Resolve the exact simulator UDID and wait for it to finish booting (3-minute limit).
+2. Compile the app and both test suites with `build-for-testing` (10-minute limit).
+3. Run `TestPlan` with `test-without-building`, executing TuneQuestTests and
+   TuneNetworkTests once (10-minute limit).
+4. On failure or cancellation, save the process list and available CoreSimulator
+   log before querying simulator state and logs (2-minute limit).
+5. Upload environment, boot, build and test logs, available `.xcresult` bundles
+   and failure diagnostics for seven days (3-minute upload limit).
 
-A failed build or test command fails **Build and unit tests** and skips subsequent
-test steps. New commits cancel superseded runs for the same pull request.
+The job retains its overall 30-minute limit. Build and test commands preserve
+their exit status while saving output with `tee`, so a failed command fails
+**Build and unit tests**. Simulator preparation failures stop compilation, and
+build failures skip test execution. Diagnostic collection and artifact upload
+are best effort; forced cancellation or runner loss can prevent them from completing.
+New commits cancel superseded runs for the same pull request.
 Simulator builds do not require signing certificates, and the unit tests do not
 require live Deezer access.
 
