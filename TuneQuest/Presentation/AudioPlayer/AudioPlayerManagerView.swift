@@ -4,24 +4,29 @@ struct AudioPlayerManagerView: View {
     @Environment(AudioPlayerManager.self) private var manager
 
     var body: some View {
-        VStack(spacing: 24) {
-            if manager.isLoading {
-                ProgressView("Cargando preview…")
-            } else {
-                HStack(spacing: 32) {
-                    Button(action: { manager.togglePlayback() }) {
-                        Image(systemName: manager.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                            .font(.system(size: 48))
-                    }
-                    Button(action: { manager.stop() }) {
-                        Image(systemName: "stop.circle.fill")
-                            .font(.system(size: 48))
-                    }
+        VStack(spacing: 12) {
+            HStack(spacing: 32) {
+                Button(action: manager.togglePlayback) {
+                    Label(
+                        manager.isPlaying || manager.isBuffering ? "Pause" : "Play",
+                        systemImage: manager.isPlaying || manager.isBuffering ? "pause.circle.fill" : "play.circle.fill"
+                    )
+                    .labelStyle(.iconOnly)
+                    .font(.largeTitle)
+                    .frame(minWidth: 56, minHeight: 56)
+                }
+                Button(action: manager.stop) {
+                    Label("Stop", systemImage: "stop.circle.fill")
+                        .labelStyle(.iconOnly)
+                        .font(.largeTitle)
+                        .frame(minWidth: 56, minHeight: 56)
                 }
             }
-        }
-        .onDisappear {
-            manager.stop()
+            .disabled(!manager.canPlay)
+
+            if manager.isBuffering {
+                ProgressView("Buffering preview…")
+            }
         }
     }
 }
