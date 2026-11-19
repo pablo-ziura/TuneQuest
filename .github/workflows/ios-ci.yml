@@ -1,0 +1,84 @@
+name: iOS CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Build and unit tests
+    runs-on: xcode-27
+    timeout-minutes: 30
+
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
+      DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=27.2
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Show environment
+        run: |
+          xcodebuild -version
+          xcrun swift --version
+          xcrun simctl list devices available
+          mkdir -p "$RUNNER_TEMP/TestResults"
+
+      - name: Build app
+        run: |
+          xcodebuild \
+            -project TuneQuest.xcodeproj \
+            -scheme TuneQuest \
+            -configuration Debug \
+            -destination "$DESTINATION" \
+            -derivedDataPath "$RUNNER_TEMP/TuneQuestDerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Run app unit tests
+        run: |
+          xcodebuild \
+            -project TuneQuest.xcodeproj \
+            -scheme TuneQuest \
+            -configuration Debug \
+            -testPlan TestPlan \
+            -destination "$DESTINATION" \
+            -derivedDataPath "$RUNNER_TEMP/TuneQuestDerivedData" \
+            -resultBundlePath "$RUNNER_TEMP/TestResults/TuneQuest.xcresult" \
+            -parallel-testing-enabled NO \
+            CODE_SIGNING_ALLOWED=NO \
+            test
+
+      - name: Run network unit tests
+        working-directory: Packages/TuneNetwork
+        run: |
+          xcodebuild \
+            -scheme TuneNetwork \
+            -configuration Debug \
+            -destination "$DESTINATION" \
+            -derivedDataPath "$RUNNER_TEMP/TuneNetworkDerivedData" \
+            -resultBundlePath "$RUNNER_TEMP/TestResults/TuneNetwork.xcresult" \
+            CODE_SIGNING_ALLOWED=NO \
+            test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-results
+          path: ${{ runner.temp }}/TestResults
+          retention-days: 7
+          if-no-files-found: ignore
