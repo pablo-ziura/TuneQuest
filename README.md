@@ -47,6 +47,13 @@ It waits for the Quality Gate and fails `SonarQube analysis` if the gate fails.
 The workflow uses GitHub OIDC to obtain a temporary Sonar token instead of a
 stored repository secret.
 
+Each workflow run invokes the scanner once. GitHub shows two related checks:
+`SonarCloud Code Analysis`, published by SonarQube Cloud, and `SonarQube analysis`,
+published by GitHub Actions. The workflow waits for the same Quality Gate result,
+so both checks fail when that gate fails. These are two status reports, not two
+scans. SonarSource action references are pinned to full commit SHAs; when updating
+them, verify the new SHA against the official release and update the version comment.
+
 Complete these settings before running the workflow:
 
 1. In the [TuneQuest SonarQube project](https://sonarcloud.io/project/overview?id=pablo-ziura_TuneQuest),
