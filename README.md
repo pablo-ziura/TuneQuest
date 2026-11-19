@@ -31,3 +31,41 @@ repository visibility and GitHub plan.
 
 Run CI on the pull request after pushing this branch to verify the GitHub-hosted
 environment.
+
+## SonarQube Cloud
+
+[SonarQube analysis](.github/workflows/sonar.yml) analyzes pull requests targeting
+`develop` and pushes to `develop`. Push analysis keeps the reference branch up to
+date for subsequent pull requests. Manual runs are available once the workflow
+is on the GitHub default branch; select `develop`, since other branches are
+skipped. The separate iOS CI workflow continues to build and test pull requests
+targeting both `main` and `develop`.
+
+The scanner checks the app and local package sources, with their test folders
+classified separately in [sonar-project.properties](sonar-project.properties).
+It waits for the Quality Gate and fails `SonarQube analysis` if the gate fails.
+The workflow uses GitHub OIDC to obtain a temporary Sonar token instead of a
+stored repository secret.
+
+Complete these settings before running the workflow:
+
+1. In the [TuneQuest SonarQube project](https://sonarcloud.io/project/overview?id=pablo-ziura_TuneQuest),
+   rename the current main branch to `develop` from the project's branch settings.
+   The Free plan only analyzes the main branch and pull requests targeting it.
+   This changes the Sonar branch configuration, not GitHub's default branch.
+2. Under project **Administration → Analysis Method**, disable **Automatic
+   Analysis** when using this CI-based workflow.
+3. In the `pablo-ziura` Sonar organization, open **Administration → Organization
+   settings → Analysis** and enable **Secretless analysis for GitHub Actions**.
+   The Sonar project must be bound to the `pablo-ziura/TuneQuest` GitHub repository.
+4. Merge the workflow into `develop` to trigger a reference analysis. After
+   verifying analysis on a pull request, require **SonarQube analysis** in the
+   GitHub ruleset for `develop`, alongside **Build and unit tests**. Require
+   branches to be up to date before merging to keep checks current with `develop`.
+
+This authentication supports pull requests from branches in this repository.
+Fork pull requests cannot obtain the required OIDC token and fail authentication;
+supporting them requires a separate analysis setup. Coverage reports are not
+imported by this workflow. The existing `.xcresult` test artifacts alone do not
+provide Sonar-compatible coverage, so coverage conditions in the Quality Gate
+require an additional report-generation and import step.
