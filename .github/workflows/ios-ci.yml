@@ -1,0 +1,126 @@
+name: iOS CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Build and unit tests
+    runs-on: xcode-27
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
+      SIMULATOR_NAME: iPhone 17
+      SIMULATOR_RUNTIME: com.apple.CoreSimulator.SimRuntime.iOS-27-2
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Show environment
+        timeout-minutes: 1
+        run: |
+          mkdir -p "$RUNNER_TEMP/TestResults"
+          {
+            xcodebuild -version
+            xcrun swift --version
+            xcrun simctl list devices available
+          } 2>&1 | tee "$RUNNER_TEMP/TestResults/environment.log"
+
+      - name: Prepare simulator
+        timeout-minutes: 3
+        run: |
+          xcrun simctl list devices available --json > "$RUNNER_TEMP/TestResults/simulators-before.json"
+          TUNEQUEST_SIMULATOR_ID=$(jq -er \
+            --arg name "$SIMULATOR_NAME" \
+            --arg runtime "$SIMULATOR_RUNTIME" '
+              .devices[$runtime] // []
+              | map(select(.isAvailable == true and .name == $name))
+              | if length == 1 then .[0].udid
+                else error("Expected exactly one available " + $name + " simulator for " + $runtime)
+                end
+            ' "$RUNNER_TEMP/TestResults/simulators-before.json")
+          echo "TUNEQUEST_SIMULATOR_ID=$TUNEQUEST_SIMULATOR_ID" >> "$GITHUB_ENV"
+          echo "DESTINATION=platform=iOS Simulator,id=$TUNEQUEST_SIMULATOR_ID" >> "$GITHUB_ENV"
+          xcrun simctl bootstatus "$TUNEQUEST_SIMULATOR_ID" -b \
+            2>&1 | tee "$RUNNER_TEMP/TestResults/simulator-boot.log"
+
+      - name: Build app and unit tests
+        timeout-minutes: 10
+        run: |
+          xcodebuild \
+            -project TuneQuest.xcodeproj \
+            -scheme TuneQuest \
+            -configuration Debug \
+            -testPlan TestPlan \
+            -destination "$DESTINATION" \
+            -destination-timeout 60 \
+            -derivedDataPath "$RUNNER_TEMP/TuneQuestDerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            build-for-testing \
+            2>&1 | tee "$RUNNER_TEMP/TestResults/build.log"
+
+      - name: Run unit tests
+        timeout-minutes: 10
+        run: |
+          xcodebuild \
+            -project TuneQuest.xcodeproj \
+            -scheme TuneQuest \
+            -configuration Debug \
+            -testPlan TestPlan \
+            -destination "$DESTINATION" \
+            -destination-timeout 60 \
+            -derivedDataPath "$RUNNER_TEMP/TuneQuestDerivedData" \
+            -resultBundlePath "$RUNNER_TEMP/TestResults/TuneQuest.xcresult" \
+            -parallel-testing-enabled NO \
+            CODE_SIGNING_ALLOWED=NO \
+            test-without-building \
+            2>&1 | tee "$RUNNER_TEMP/TestResults/tests.log"
+
+      - name: Collect failure diagnostics
+        if: failure() || cancelled()
+        timeout-minutes: 2
+        run: |
+          mkdir -p "$RUNNER_TEMP/TestResults"
+          ps -axo pid,ppid,state,etime,command \
+            > "$RUNNER_TEMP/TestResults/processes.txt" 2>&1 || true
+          if [ -f "$HOME/Library/Logs/CoreSimulator/CoreSimulator.log" ]; then
+            cp "$HOME/Library/Logs/CoreSimulator/CoreSimulator.log" \
+              "$RUNNER_TEMP/TestResults/CoreSimulator.log" || true
+          fi
+          xcrun simctl list devices --json \
+            > "$RUNNER_TEMP/TestResults/simulators-after.json" 2>&1 || true
+          if [ -n "${TUNEQUEST_SIMULATOR_ID:-}" ]; then
+            xcrun simctl spawn "$TUNEQUEST_SIMULATOR_ID" log show \
+              --last 10m --style compact \
+              --predicate 'process == "testmanagerd" OR process == "runningboardd" OR process == "SpringBoard" OR process == "TuneQuest" OR process == "xctest"' \
+              > "$RUNNER_TEMP/TestResults/simulator.log" 2>&1 || true
+          fi
+
+      - name: Upload test results
+        if: always()
+        timeout-minutes: 3
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-results
+          path: ${{ runner.temp }}/TestResults
+          retention-days: 7
+          if-no-files-found: ignore

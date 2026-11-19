@@ -54,6 +54,15 @@ final class AudioPlayerManager {
         notificationObservers.forEach { NotificationCenter.default.removeObserver($0) }
     }
 
+    func trackInfo(for trackId: Int) async -> Track? {
+        do {
+            return try await getPreviewUseCase.execute(trackId: trackId)
+        } catch {
+            print("Error de red: \(error)")
+            return nil
+        }
+    }
+
     func loadPreview(trackId: Int) async {
         guard !Task.isCancelled else { return }
         clearPreview()
